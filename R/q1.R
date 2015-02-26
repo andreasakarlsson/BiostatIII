@@ -1,30 +1,66 @@
-# Date: 2014-01-30
-# Purpose: To do the solution for Biostat III exercises in R
-# Author: Annika Tillander
+## Purpose: To do the solution for Biostat III exercises in R
+## Author: Annika Tillander, 2014-01-30
+## Edited: Andreas Karlsson, 2015-02-17
 ###############################################################################
 
-#Install needed packages only need to be done once
+
+## Install needed packages only need to be done once
+install.packages("foreign")
 install.packages("survival")
 install.packages("KMsurv")
-install.packages("foreign")
-install.packages("lattice")
-install.packages("muhaz")
-install.packages("nlmez")
-
-
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("GGally")
 
 ###############################################################################
-#Exercise 1
+## Exercise 1b
 ###############################################################################
 
-#Load the needed packages needs to be done each session
+## change to git-url
+source(paste0("~/src/ki/BiostatIII/newSolutions/R/","ggkm.R"))
+## Load the needed packages needs to be done each session
+require(foreign) #Needed to read data set from Stata
 require(survival)
 require(KMsurv)
-require(foreign) #Needed to read data set from Stata
-require(nlme) #for gsummary
+#require(nlme) #for gsummary
+require(dplyr)
+require(ggplot2)
+require(GGally)
 
-#Get the data for exercise 1
+## Get the data for exercise 1
 colon_sample <- read.dta("http://biostat3.net/download/colon_sample.dta")
+
+## Create 0/1 outcome variable, create start time variable, 
+colon <- mutate(colon_sample,
+                death_cancer = ifelse( status == "Dead: cancer", 1, 0),
+                start_time = 0)
+
+## Number of events and number lost summarised by month
+colon12 <- colon %>%
+    mutate(t12m = floor(surv_mm / 12)) %>%
+    group_by(t12m) %>%
+    summarise(nevent = sum(death_cancer),
+              nlost = length(death_cancer)-sum(death_cancer))
+
+##b Life table (NA is added since lifetab wants the end of the last interval)
+lifetab(c(colon12$t12m,NA), 35, colon12$nlost, colon12$nevent)
+
+## Kaplan-Meier esimates
+mfit <- survfit(Surv(start_time, surv_mm, death_cancer) ~1, data = colon)
+summary(mfit)
+ggsurv(mfit) + ylab("S(t)") + xlab("Time since diagnosis in months") +
+    ggtitle("Kaplan−Meier estimates of cause−specific survival")
+
+## Kaplan-Meier esimates with number at risk
+sfit <- survfit(Surv(start_time, surv_mm, death_cancer) ~sex, data = colon)
+ggkm(sfit, table=T, pval=F, timeby = 10)
+
+
+
+
+
+colon_sample <- read.dta("http://biostat3.net/download/colon_sample.dta")
+
 
 ### Construct life table with Actuarial approach ###
 attach(colon_sample)
