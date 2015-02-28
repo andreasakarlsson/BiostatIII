@@ -17,12 +17,11 @@ opts_chunk$set(cache=FALSE)
 
 You may have to install the required packages the first time you use them. You can install a package by `install.packages("package_of_interest")` for each package you require.
 
-```{r LoadDependecies, message=FALSE}
+```{r loadDependecies, message=FALSE}
 ```
 
-```{r loadPreprocessData}
-```
 Number of events and number lost summarised by year.
+
 ```{r eventsPerMonth}
 ```
 

@@ -3,51 +3,47 @@
 # Edited: Andreas Karlsson, 2015-02-24 
 ###############################################################################
 
-#Install needed packages only need to be done once
-install.packages("survival")
-install.packages("KMsurv")
-#install.packages("foreign")
-install.packages("readstata13")
-install.packages("lattice")
-install.packages("muhaz")
-install.packages("nlmez")
+## Install needed packages only need to be done once
+## install.packages("survival")
+## install.packages("KMsurv")
+## install.packages("readstata13")
+## install.packages("dplyr")
+## install.packages("ggplot2")
+## install.packages("Gally")
+## install.packages("muhaz")
+## install.packages("gridExtra")
 
-
-## Call muhaz smoother by strata
-smoothHazard <- function(df, strata)
-{   tmp <- lapply(as.list(levels(with(df,strata))),
-                  function(x) c(strata=x,with(melanoma,muhaz(times=surv_mm, delta=death_cancer, subset=strata==x))))
-    out <- do.call("rbind",
-                   lapply(tmp,function(obj) data.frame(Hazard=obj$haz.est, Time=obj$est.grid, Strata=obj$strata)))
-    return(out)
-}
 
 ###############################################################################
 #Exercise 2
 ###############################################################################
+## @knitr loadDependecies
 require(readstata13) #Needed to read data set from Stata 13
-#require(foreign) #Needed to read data set from Stata 5-12
-#require(rms)
 require(survival) #for Surv and survfit
 require(muhaz) #for hazard estimates
-require(lattice) #for grouped plots
-
-
-
 require(dplyr)
 require(ggplot2)
 require(GGally)
 require(gridExtra)
 
-## Load and pre-process data
+## Call muhaz smoother by strata function
+smoothHazard <- function(df, strat){
+    tmp <- lapply(as.list(levels(df[,strat])),
+                  function(x) c(strat=x,with(melanoma,muhaz(times=surv_mm, delta=death_cancer, subset=df[strat]==x))))
+    out <- do.call("rbind",
+                   lapply(tmp,function(obj) data.frame(Hazard=obj$haz.est, Time=obj$est.grid, Strata=obj$strat)))
+    return(out)}
+
+
+## @knitr loadPreprocess
 melanoma_raw <- read.dta13("http://biostat3.net/download/melanoma.dta")
 melanoma <- mutate(melanoma_raw,
                    death_cancer = ifelse( status == "Dead: cancer", 1, 0),
-                   death_all = ifelse( status == "Dead: cancer" | status == "Dead: other", 1, 0),
-                   start_time = 0)
+                   death_all = ifelse( status == "Dead: cancer" | status == "Dead: other", 1, 0))
 
-#a
-## Tabulate events by stage
+
+## a Tabulate events by stage
+## @knitr a_tabulate
 melanoma %>%
     group_by(stage) %>%
     summarise(Freq = n(),
@@ -55,43 +51,21 @@ melanoma %>%
     mutate(Cum = cumsum(Percent))
 
 ## Fit and plot survival
-mfit <- survfit(Surv(start_time, surv_mm, death_cancer==1)~stage, data = melanoma)
+## @knitr a_plotSurv
+mfit <- survfit(Surv(surv_mm, death_cancer==1)~stage, data = melanoma)
 p1 <- ggsurv(mfit, cens.shape="|", cens.col = "black") +
     ggtitle("Kaplan-Meier survival estimates") +
     theme(legend.position="bottom")
 ## Fit and plot smoothed hazard
-## hazard <- kphaz.fit(time=melanoma$surv_mm,status=melanoma$death_cancer,strata=melanoma$stage) %>%
-##     data.frame() %>%
-##     mutate(strata = c("Unknown","Localised","Regional", "Distant")[strata])
-## p2 <- ggplot(hazard, aes(x=time, y=haz, group=strata, colour= strata)) +
-##     geom_point(alpha=0.5, size=1)+
-##     stat_smooth() +
-##     ggtitle("Smoothed Hazard estimates") +
-##     ylab("Hazard") +
-##     theme(legend.position="bottom")
-p2 <- ggplot(smoothHazard(melanoma,stage), aes(x=Time, y=Hazard, group=Strata, colour= Strata)) +
+p2 <- ggplot(smoothHazard(melanoma,"stage"), aes(x=Time, y=Hazard, colour= Strata)) +
     geom_line() +
     ggtitle("Smoothed Hazard estimates") +
     theme(legend.position="bottom")
 grid.arrange(p1, p2, ncol=2)
 
 
-## muhaz, below, is more similar to the stata smoothed hazard (uses epanechnikov as boundary kernel function).
-## hfitU <- muhaz(times=melanoma$surv_mm, delta=melanoma$death_cancer, subset=melanoma$stage=="Unknown")
-## hfitL <- muhaz(times=melanoma$surv_mm, delta=melanoma$death_cancer, subset=melanoma$stage=="Localised")
-## hfitR <- muhaz(times=melanoma$surv_mm, delta=melanoma$death_cancer, subset=melanoma$stage=="Regional")
-## hfitD <- muhaz(times=melanoma$surv_mm, delta=melanoma$death_cancer, subset=melanoma$stage=="Distant")
-## ## Combine the data for the different stages
-## smoothHaz <- data.frame(Hazard = c(hfitU$haz.est, hfitL$haz.est, hfitR$haz.est, hfitD$haz.est),
-##                        Time = c(hfitU$est.grid, hfitL$est.grid, hfitR$est.grid, hfitD$est.grid), 
-##                        Strata = c(rep("Unknown", 101), rep("Localised", 101), rep("Regional", 101), rep("Distant", 101)))
-## ggplot(smoothHazByStage, aes(x=Time, y=Hazard, group=Strata, colour= Strata)) +
-##     geom_line() +
-##     ggtitle("Smoothed Hazard estimates") +
-##     xlab("Time since diagnosis in months")
-
-
-##b Tabulate crude rates by month and year
+## Tabulate crude rates by month and year
+## @knitr b_crudeRates
 melanoma %>%
     select(death_cancer, surv_mm, stage) %>%
     group_by(stage) %>%
@@ -110,8 +84,8 @@ melanoma %>%
     mutate(CI_lower = Rate + qnorm(0.025) * Rate / sqrt(D),
            CI_high = Rate + qnorm(0.975) * Rate / sqrt(D))
 
-   
-##c Tabulate crude rates per 1000
+## Tabulate crude rates per 1000   
+## @knitr c_crudeRates1000 
 melanoma %>%
     select(death_cancer, surv_yy, stage) %>%
     group_by(stage) %>%
@@ -121,7 +95,8 @@ melanoma %>%
     mutate(CI_lower = Rate + qnorm(0.025) * Rate / sqrt(D),
            CI_high = Rate + qnorm(0.975) * Rate / sqrt(D))
 
-##d Tabulate crude rate and plot S(t) & Haz by sex
+## Tabulate crude rate and plot S(t) & Haz by sex
+## @knitr d_crudeRates1000_sex
 melanoma %>%
     select(death_cancer, surv_yy, sex) %>%
     group_by(sex) %>%
@@ -131,22 +106,14 @@ melanoma %>%
     mutate(CI_lower = Rate + qnorm(0.025) * Rate / sqrt(D),
            CI_high = Rate + qnorm(0.975) * Rate / sqrt(D))
 
+## @knitr d_plotSurv_sex
 ## Fit and plot survival
-sfit <- survfit(Surv(start_time, surv_mm, death_cancer==1)~sex, data = melanoma)
+sfit <- survfit(Surv(surv_mm, death_cancer==1)~sex, data = melanoma)
 p3 <- ggsurv(sfit, cens.shape="|", cens.col = "black") +
     ggtitle("Kaplan-Meier survival estimates") +
     theme(legend.position="bottom")
 #Kaplan-Meier hazards smoothed 
-## hazard <- kphaz.fit(time=melanoma$surv_mm,status=melanoma$death_cancer,strata=melanoma$sex) %>%
-##     data.frame() %>%
-##     mutate(strata = c("Male", "Female")[strata])
-## p4 <- ggplot(hazard, aes(x=time, y=haz, group=strata, colour= strata)) +
-##      geom_point(alpha=0.5, size=1)+
-##     stat_smooth(span=0.5) +
-##     ggtitle("Smoothed Hazard estimates") +
-##     ylab("Hazard") +
-##     theme(legend.position="bottom")
-p4 <- ggplot(smoothHazard(melanoma, sex), aes(x=Time, y=Hazard, group=Strata, colour= Strata)) +
+p4 <- ggplot(smoothHazard(melanoma, "sex"), aes(x=Time, y=Hazard, colour= Strata)) +
     geom_line() +
     ggtitle("Smoothed Hazard estimates") +
     theme(legend.position="bottom")
@@ -154,18 +121,21 @@ grid.arrange(p3, p4, ncol=2)
 
 
 ##e Tabulate by age group
+## @knitr e_tabByAge
 with(melanoma,table(status, agegrp))
 
 
 ##f Kaplan-Meier estimate Cancer vs All-cause
-afit <- survfit(Surv(start_time, surv_mm, death_all==1)~stage, data = melanoma)
+## @knitr f_survStage
+afit <- survfit(Surv(surv_mm, death_all==1)~stage, data = melanoma)
 ggsurv(afit, cens.shape="|", cens.col = "black") +
     ggtitle("Kaplan-Meier survival estimates\nAll-cause") +
     theme(legend.position="bottom")
 
 ##g Kaplan-Meier estimate Cancer vs All-cause | age 75+
-mfit75 <- survfit(Surv(start_time, surv_mm, death_cancer==1)~stage, data = subset(melanoma,agegrp=="75+"))
-afit75 <- survfit(Surv(start_time, surv_mm, death_all==1)~stage, data = subset(melanoma,agegrp=="75+"))
+## @knitr g_allCa75p
+mfit75 <- survfit(Surv(surv_mm, death_cancer==1)~stage, data = subset(melanoma,agegrp=="75+"))
+afit75 <- survfit(Surv(surv_mm, death_all==1)~stage, data = subset(melanoma,agegrp=="75+"))
 p6 <- ggsurv(mfit75, cens.shape="|", cens.col = "black") +
     ggtitle("Kaplan-Meier survival estimates\nCancer | Age 75+") +
     theme(legend.position="bottom")
@@ -174,9 +144,10 @@ p7 <- ggsurv(afit75, cens.shape="|", cens.col = "black") +
     theme(legend.position="bottom")
 grid.arrange(p6, p7, ncol=2)
 
-##h Kaplan-Meier estimate Cancer vs All-cause by age group
-mfitage <- survfit(Surv(start_time, surv_mm, death_cancer==1)~agegrp, data = melanoma)
-afitage <- survfit(Surv(start_time, surv_mm, death_all==1)~agegrp, data = melanoma)
+## Kaplan-Meier estimate Cancer vs All-cause by age group
+## @knitr h_allCaAgeGrp 
+mfitage <- survfit(Surv(surv_mm, death_cancer==1)~agegrp, data = melanoma)
+afitage <- survfit(Surv(surv_mm, death_all==1)~agegrp, data = melanoma)
 p8 <- ggsurv(mfitage, cens.shape="|", cens.col = "black") +
     ggtitle("Kaplan-Meier estimates of\ncancer survival by age group") +
     theme(legend.position="bottom")
@@ -186,6 +157,7 @@ p9 <- ggsurv(afitage, cens.shape="|", cens.col = "black") +
 grid.arrange(p8, p9, ncol=2)
 
 
+## @knitr break
 #a
 #Construct a variable for starting time
 start_time <- rep(0, length(melanoma$status))

@@ -17,7 +17,7 @@
 ## Exercise 1b
 ###############################################################################
 
-## @knitr LoadDependecies
+## @knitr loadDependecies
 require(foreign) #Needed to read data set from Stata
 require(survival)
 require(KMsurv)

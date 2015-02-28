@@ -1,0 +1,55 @@
+Biostat III exercises in R
+===========
+Laboratory exercise 2
+-----------
+
+### Suggested solutions by
+Author: Annika Tillander, 2014-01-30  
+Edited: Andreas Karlsson, 2015-02-28
+
+-----------
+
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
+library('knitr')	
+read_chunk('q2.R')
+opts_chunk$set(cache=FALSE)
+```
+
+You may have to install the required packages the first time you use them. You can install a package by `install.packages("package_of_interest")` for each package you require.
+
+```{r loadDependecies, message=FALSE}
+```
+
+```{r loadPreprocess}
+```
+
+
+```{r a_tabulate}
+```
+
+```{r a_plotSurv}
+```
+
+```{r b_crudeRates}
+```
+
+```{r c_crudeRates1000}
+```
+
+```{r d_crudeRates1000_sex}
+```
+
+```{r d_plotSurv_sex}
+```
+
+```{r e_tabByAge}
+```
+
+```{r f_survStage}
+```
+
+```{r g_allCa75p, , fig.width=7, fig.height=7}
+```
+
+```{r h_allCaAgeGrp}
+```
