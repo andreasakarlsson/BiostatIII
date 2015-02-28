@@ -12,7 +12,7 @@ Edited: Andreas Karlsson, 2015-02-27
 ```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
 library('knitr')	
 read_chunk('q1.R')
-opts_chunk$set(cache=FALSE)
+opts_chunk$set(cache=FALSE, fig.width=7, fig.height=6)
 ```
 
 You may have to install the required packages the first time you use them. You can install a package by `install.packages("package_of_interest")` for each package you require.
@@ -36,7 +36,7 @@ Following is a table of Kaplan-Meier estimates. It is not clear from the table, 
 ```{r KaplanMeier, message=FALSE}
 ```
 
-Kaplan-Meier esimates by sex with a table of the number at risk.
+You can also create Kaplan-Meier esimates stratified by sex with a number at risk table below.
 
 ```{r KaplanMeierNumberAtRisk, message=FALSE, fig.width=7, fig.height=7}
 ```

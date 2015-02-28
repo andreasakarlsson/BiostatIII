@@ -12,6 +12,7 @@
 ## install.packages("ggplot2")
 ## install.packages("GGally")
 ## install.packages("gridExtra")
+## install.packages("RCurl")
 
 ###############################################################################
 ## Exercise 1b
@@ -25,8 +26,7 @@ require(dplyr)
 require(ggplot2)
 require(GGally)
 require(gridExtra)
-setwd(Sys.getenv("PWD")); source("ggkm.R") #For number at risk plot 
-
+require(RCurl)
 
 ## Get the data for exercise 1
 colon_sample <- read.dta("http://biostat3.net/download/colon_sample.dta")
@@ -46,11 +46,12 @@ colonByYear <- colon %>%
 with(colonByYear, lifetab(c(year,tail(year,1)+1), 35, nlost, nevent))[,1:8]
 
 ## @knitr KaplanMeier
-mfit <- survfit(Surv(surv_mm, death_cancer) ~1, data = colon)
+mfit <- survfit(Surv(surv_mm, death_cancer) ~ 1, data = colon)
 summary(mfit)
 ggsurv(mfit) + ylab("S(t)") + xlab("Time since diagnosis in months") +
     ggtitle("Kaplan−Meier estimates of cause−specific survival")
 
 ## @knitr KaplanMeierNumberAtRisk
-sfit <- survfit(Surv(surv_mm, death_cancer) ~sex, data = colon)
+eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/ggkm.R")))
+sfit <- survfit(Surv(surv_mm, death_cancer) ~ sex, data = colon)
 ggkm(sfit, table=T, pval=F, timeby = 10)

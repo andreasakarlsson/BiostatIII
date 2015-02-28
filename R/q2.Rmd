@@ -81,4 +81,3 @@ A difference which is also reflected in the survival and hazard curves below.
 
 ```{r h_allCaAgeGrp}
 ```
-
