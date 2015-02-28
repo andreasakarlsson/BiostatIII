@@ -5,7 +5,7 @@ Laboratory exercise 1b
 
 ### Suggested solutions by
 Author: Annika Tillander, 2014-01-30  
-Edited: Andreas Karlsson, 2015-02-17
+Edited: Andreas Karlsson, 2015-02-27
 
 -----------
 
@@ -15,13 +15,14 @@ read_chunk('q1.R')
 opts_chunk$set(cache=FALSE)
 ```
 
+You may have to install the required packages the first time you use them. You can install a package by `install.packages("package_of_interest")` for each package you require.
 
 ```{r LoadDependecies, message=FALSE}
 ```
 
 ```{r loadPreprocessData}
 ```
-Number of events and number lost summarised by month.
+Number of events and number lost summarised by year.
 ```{r eventsPerMonth}
 ```
 
@@ -36,7 +37,7 @@ Following is a table of Kaplan-Meier estimates. It is not clear from the table, 
 ```{r KaplanMeier, message=FALSE}
 ```
 
-Kaplan-Meier esimates with number table at risk at the bottom. 
+Kaplan-Meier esimates by sex with a table of the number at risk.
 
 ```{r KaplanMeierNumberAtRisk, message=FALSE, fig.width=7, fig.height=7}
 ```
