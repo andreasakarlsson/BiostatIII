@@ -65,6 +65,9 @@ melanoma %>%
     mutate(CI_low = Rate + qnorm(0.025) * Rate / sqrt(D),
            CI_high = Rate + qnorm(0.975) * Rate / sqrt(D))
 
+## alternative:
+## ir.est(melanoma, grp="stage", event="death_cancer", p.time="surv_mm")
+
 melanoma %>%
     select(death_cancer, surv_yy, stage) %>%
     group_by(stage) %>%
