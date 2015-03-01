@@ -3,13 +3,12 @@
 ## Edited: Andreas Karlsson, 2015-02-28
 ###############################################################################
 
-## ## Install needed packages only need to be done once
-## install.packages("survival")
-## install.packages("KMsurv")
-## install.packages("foreign")
-## install.packages("lattice")
-## install.packages("muhaz")
-## install.packages("nlmez")
+## Install needed packages only need to be done once
+## install.packages(readstata13) #Needed to read data set from Stata 13
+## install.packages(survival) #for Surv and survfit
+## install.packages(KMsurv)
+## install.packages(dplyr)
+
 
 
 ###############################################################################

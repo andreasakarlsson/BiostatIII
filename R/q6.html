@@ -81,12 +81,11 @@ require(foreign) #Needed to read data set from Stata
 require(ggplot2)
 require(RCurl)
 eval(expr=parse(text=getURL(&quot;https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R&quot;)))</code></pre>
+<p>Load diet data and explore it.</p>
 <pre class="r"><code>diet &lt;- data.frame(read.dta(&quot;http://biostat3.net/download/diet.dta&quot;))
-
-## Look at data
 head(diet)
 summary(diet)</code></pre>
-<p>Tabulate CHD incidence rates per 1000 person-years for each category of hieng. Calculate (by hand) the ratio of the two incidence rates.</p>
+<p><strong>(a)</strong> Tabulate CHD incidence rates per 1000 person-years for each category of hieng. Calculate (by hand) the ratio of the two incidence rates.</p>
 <pre class="r"><code>diet$y1k &lt;- diet$y/1000
 diet.ir6a &lt;- ir.est(diet, grp=&quot;hieng&quot;, event=&quot;chd&quot;, p.time=&quot;y1k&quot;)
 print(diet.ir6a)</code></pre>
@@ -96,7 +95,7 @@ print(diet.ir6a)</code></pre>
 <pre class="r"><code>## IRR
 diet.ir6a[diet.ir6a$hieng==&quot;high&quot;,&quot;IR&quot;] / diet.ir6a[diet.ir6a$hieng==&quot;low&quot;,&quot;IR&quot;]</code></pre>
 <pre><code>## [1] 0.5203599</code></pre>
-<p><strong>(a)</strong> Fit a poisson model to find the incidence rate ratio for the high energy group compared to the low energy group and compare the estimate to the one you obtained in the previous question.</p>
+<p><strong>(b)</strong> Fit a poisson model to find the incidence rate ratio for the high energy group compared to the low energy group and compare the estimate to the one you obtained in the previous question.</p>
 <pre class="r"><code>poisson6b &lt;- glm( chd ~ hieng + offset( log( y1k ) ), family=poisson, data=diet)
 summary(poisson6b)</code></pre>
 <pre><code>## 
@@ -127,7 +126,7 @@ summary(poisson6b)</code></pre>
 <pre><code>##                            2.5 %     97.5 %
 ## (Intercept) 13.5959916 9.1614552 19.2715805
 ## hienghigh    0.5203599 0.2829171  0.9328392</code></pre>
-<p><strong>(b)</strong> Grouping the values of total energy into just two groups does not tell us much about how the CHD rate changes with total energy. It is a useful exploratory device, but to look more closely we need to group the total energy into perhaps 3 or 4 groups.</p>
+<p><strong>(c)</strong> Grouping the values of total energy into just two groups does not tell us much about how the CHD rate changes with total energy. It is a useful exploratory device, but to look more closely we need to group the total energy into perhaps 3 or 4 groups.</p>
 <p>In this example we shall use the cut points 1500, 2500, 3000, 4500. Compare with a normal distribution to check if these cutpoints seem reasonable.</p>
 <pre class="r"><code>ggplot(diet, aes(energy)) + geom_histogram(aes(y=..density..), colour=&quot;black&quot;, fill=&quot;white&quot;) +
     stat_function(fun = dnorm, args = list(mean = mean(diet$energy), sd = sd(diet$energy)),

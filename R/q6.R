@@ -23,8 +23,6 @@ eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/
 
 ## @knitr loadPreprocess
 diet <- data.frame(read.dta("http://biostat3.net/download/diet.dta"))
-
-## Look at data
 head(diet)
 summary(diet)
 

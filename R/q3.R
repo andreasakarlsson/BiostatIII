@@ -12,6 +12,7 @@
 ## install.packages("Gally")
 ## install.packages("muhaz")
 ## install.packages("gridExtra")
+## install.packages("RCurl")
 
 
 ###############################################################################
@@ -25,17 +26,8 @@ require(dplyr)
 require(ggplot2)
 require(GGally)
 require(gridExtra)
-
-
-## wrapper function for muhaz hazard smoother by strata
-smoothHazard <- function(df, strat){
-    tmp <- lapply(as.list(sort(levels(df[,strat]))),
-                  function(x) c(strat=x, with(df[df[strat]==x,],
-                                    muhaz(times=surv_mm, delta=death_cancer, max.time = max(surv_mm)))))
-    out <- do.call("rbind", lapply(tmp,function(obj)
-                                   data.frame(obj$haz.est, obj$est.grid, obj$strat)))
-    colnames(out) <- c("Hazard","Time", strat)
-    return(out)}
+require(RCurl)
+eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R")))
 
 ## @knitr loadPreprocess
 melanoma_raw<- read.dta13("http://biostat3.net/download/melanoma.dta")
