@@ -19,7 +19,7 @@ require(epiR)
 require(foreign) #Needed to read data set from Stata
 require(ggplot2)
 require(RCurl)
-eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R", .opts = list(ssl.verifypeer = FALSE))))
+helperFunctions <- eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R", .opts = list(ssl.verifypeer = FALSE))))
 
 ## @knitr loadPreprocess
 diet <- data.frame(read.dta("http://biostat3.net/download/diet.dta"))

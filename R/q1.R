@@ -52,6 +52,6 @@ ggsurv(mfit) + ylab("S(t)") + xlab("Time since diagnosis in months") +
     ggtitle("Kaplan−Meier estimates of cause−specific survival")
 
 ## @knitr KaplanMeierNumberAtRisk
-eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/ggkm.R", .opts = list(ssl.verifypeer = FALSE))))
+ggkm <- eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/ggkm.R", .opts = list(ssl.verifypeer = FALSE))))
 sfit <- survfit(Surv(surv_mm, death_cancer) ~ sex, data = colon)
 ggkm(sfit, table=T, pval=F, timeby = 10)

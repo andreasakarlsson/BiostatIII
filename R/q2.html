@@ -79,7 +79,7 @@ require(ggplot2)
 require(GGally)
 require(gridExtra)
 require(RCurl)
-eval(expr=parse(text=getURL(&quot;https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R&quot;)))</code></pre>
+helperFunctions &lt;- eval(expr=parse(text=getURL(&quot;https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R&quot;, .opts = list(ssl.verifypeer = FALSE))))</code></pre>
 <p>We start by reading the data and listing the first few observations to get an idea about the data. We then define a 1/0 varible for the events that we are interested in.</p>
 <pre class="r"><code>melanoma_raw &lt;- read.dta13(&quot;http://biostat3.net/download/melanoma.dta&quot;)
 head(melanoma_raw[c(&quot;age&quot;, &quot;sex&quot;, &quot;stage&quot;, &quot;status&quot;, &quot;surv_mm&quot;, &quot;surv_yy&quot;)])</code></pre>

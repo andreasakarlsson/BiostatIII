@@ -79,7 +79,7 @@ require(ggplot2)
 require(GGally)
 require(gridExtra)
 require(RCurl)
-eval(expr=parse(text=getURL(&quot;https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R&quot;)))</code></pre>
+helperFunctions &lt;- eval(expr=parse(text=getURL(&quot;https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R&quot;, .opts = list(ssl.verifypeer = FALSE))))</code></pre>
 <p>We will now analyse the full data set of patients diagnosed with localised skin melanoma. We start by reading the data selecting those with a localised stage and then define a 1/0 varible for the events that we are interested in.</p>
 <pre class="r"><code>melanoma_raw&lt;- read.dta13(&quot;http://biostat3.net/download/melanoma.dta&quot;)
 melanoma &lt;- melanoma_raw %&gt;%

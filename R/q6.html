@@ -80,7 +80,7 @@ require(epiR)
 require(foreign) #Needed to read data set from Stata
 require(ggplot2)
 require(RCurl)
-eval(expr=parse(text=getURL(&quot;https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R&quot;)))</code></pre>
+helperFunctions &lt;- eval(expr=parse(text=getURL(&quot;https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R&quot;, .opts = list(ssl.verifypeer = FALSE))))</code></pre>
 <p>Load diet data and explore it.</p>
 <pre class="r"><code>diet &lt;- data.frame(read.dta(&quot;http://biostat3.net/download/diet.dta&quot;))
 head(diet)
