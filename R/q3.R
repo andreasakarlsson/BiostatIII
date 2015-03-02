@@ -27,7 +27,7 @@ require(ggplot2)
 require(GGally)
 require(gridExtra)
 require(RCurl)
-eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R")))
+eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R", .opts = list(ssl.verifypeer = FALSE))))
 
 ## @knitr loadPreprocess
 melanoma_raw<- read.dta13("http://biostat3.net/download/melanoma.dta")
