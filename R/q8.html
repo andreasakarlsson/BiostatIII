@@ -197,80 +197,176 @@ summary(poisson8c)</code></pre>
 ## hienghigh   0.4966098 0.2663418  0.905103
 ## jobNumber   0.9166234 0.6563978  1.292278
 ## bmi         1.0522316 0.9579153  1.154651</code></pre>
-<p><strong>(d)</strong> This is work in progress, please look at the stata code for now.</p>
+<pre class="r"><code>##########################################################</code></pre>
+<p><strong>(d)</strong> Now fit the model for CHD, both without and with the adjustment for job and bmi. Is the effect of hieng on CHD confounded by age, BMI or job? Write the linear predictors using pen and paper.</p>
+<p>Firstly, let’s adjust for the timescale attained age. To do this in Poisson regression you must split the data on timescale age. The risktime variable contains the correct amount of risktime for each timeband.</p>
+<pre class="r"><code>## Create a variable for age at entry
+diet &lt;- mutate(diet, entry_age = as.numeric( doe - dob ) / 365.24)
+
+## Split time at 30,50,60 and 72 with time scale age at entry to attained age, the zero=0 makes output be in absolute age
+diet.spl.dob &lt;- survSplit(diet, cut=c(30,50,60,72), end=&quot;att_age&quot;, start=&quot;entry_age&quot;, event=&quot;chd&quot;, zero = 0)
+
+## Tabulate ageband
+diet.spl.dob %&gt;% select(id, entry_age, att_age, y) %&gt;% filter(id&lt;=3) %&gt;% arrange(id, entry_age)</code></pre>
+<pre><code>##   id entry_age  att_age        y
+## 1  1  49.61669 50.00000 12.29295
+## 2  1  50.00000 60.00000 12.29295
+## 3  1  60.00000 61.90998 12.29295
+## 4  2  50.53937 60.00000 11.95893
+## 5  2  60.00000 62.49863 11.95893
+## 6  3  58.78600 60.00000 11.04175
+## 7  3  60.00000 69.82806 11.04175</code></pre>
+<pre class="r"><code>## Create an agespan variable
+diet.spl.dob &lt;- mutate(diet.spl.dob,
+                       agespan = NA,
+                       agespan = ifelse( entry_age&gt;=30 &amp; entry_age &lt;50 , 30, agespan),
+                       agespan = ifelse( entry_age&gt;=50 &amp; entry_age &lt;60 , 50, agespan),
+                       agespan = ifelse( entry_age&gt;=60 &amp; entry_age &lt;72, 60, agespan))
+
+## Make the numeric variables factors since we want to model them with dummie variables and calculate time at risk
+diet.spl.dob &lt;- mutate(diet.spl.dob,
+                       agespan = as.factor(agespan),
+                       jobNumber = as.factor(jobNumber),
+                       risk_time = (att_age - entry_age))
+
+## Tabulate ageband including risk_time
+diet.spl.dob %&gt;% select(id,  entry_age, att_age, y,risk_time) %&gt;% filter(id&lt;=3) %&gt;% arrange(id, entry_age)</code></pre>
+<pre><code>##   id entry_age  att_age        y  risk_time
+## 1  1  49.61669 50.00000 12.29295  0.3833096
+## 2  1  50.00000 60.00000 12.29295 10.0000000
+## 3  1  60.00000 61.90998 12.29295  1.9099770
+## 4  2  50.53937 60.00000 11.95893  9.4606286
+## 5  2  60.00000 62.49863 11.95893  2.4986310
+## 6  3  58.78600 60.00000 11.04175  1.2139963
+## 7  3  60.00000 69.82806 11.04175  9.8280583</code></pre>
+<pre class="r"><code>## Tabulate number of events per agespan
+diet.spl.dob %&gt;%
+    group_by(agespan) %&gt;%
+    summarise(noFailure=sum(chd==0), Failure=sum(chd), Total=n())</code></pre>
+<pre><code>## Source: local data frame [3 x 4]
+## 
+##   agespan noFailure Failure Total
+## 1      30       190       6   196
+## 2      50       275      18   293
+## 3      60       218      22   240</code></pre>
+<p>Fitting the model for CHD, without adjustment for job and bmi.</p>
+<pre class="r"><code>poisson8d &lt;- glm( chd ~ hieng + agespan + offset( log( risk_time) ),
+                 family=poisson,
+                 data=diet.spl.dob)
+
+summary(poisson8d)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = chd ~ hieng + agespan + offset(log(risk_time)), 
+##     family = poisson, data = diet.spl.dob)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.6253  -0.4312  -0.3246  -0.2050   2.8938  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -4.7798     0.4320 -11.065   &lt;2e-16 ***
+## hienghigh    -0.6233     0.3026  -2.060   0.0394 *  
+## agespan50     0.3025     0.4721   0.641   0.5217    
+## agespan60     0.8451     0.4613   1.832   0.0670 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 321.05  on 728  degrees of freedom
+## Residual deviance: 311.40  on 725  degrees of freedom
+## AIC: 411.4
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>IRR(poisson8d)</code></pre>
+<pre><code>##                     IRR Std. err    CI_lower   CI_upper
+## (Intercept) 0.008397598 1.540327 0.003601089 0.01958287
+## hienghigh   0.536168916 1.353438 0.296266536 0.97033270
+## agespan50   1.353254649 1.603338 0.536451590 3.41372489
+## agespan60   2.328213936 1.586165 0.942628010 5.75049762</code></pre>
+<p>Fitting the model for CHD, with adjustment for job and bmi.</p>
+<pre class="r"><code>poisson8d &lt;- glm( chd ~ hieng + agespan + jobNumber + bmi + offset( log( risk_time) ),
+                 family=poisson,
+                 data=diet.spl.dob)
+
+summary(poisson8d)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = chd ~ hieng + agespan + jobNumber + bmi + offset(log(risk_time)), 
+##     family = poisson, data = diet.spl.dob)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.7714  -0.4027  -0.3083  -0.1940   3.0174  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -6.79183    1.31326  -5.172 2.32e-07 ***
+## hienghigh   -0.71303    0.31387  -2.272   0.0231 *  
+## agespan50    0.53692    0.50868   1.056   0.2912    
+## agespan60    1.07421    0.49668   2.163   0.0306 *  
+## jobNumber1   0.43510    0.40670   1.070   0.2847    
+## jobNumber2  -0.13791    0.37184  -0.371   0.7107    
+## bmi          0.07388    0.04852   1.523   0.1278    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 313.24  on 718  degrees of freedom
+## Residual deviance: 298.77  on 712  degrees of freedom
+##   (10 observations deleted due to missingness)
+## AIC: 402.77
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>IRR(poisson8d)</code></pre>
+<pre><code>##                     IRR Std. err     CI_lower   CI_upper
+## (Intercept) 0.001122909 3.718282 8.559996e-05 0.01473044
+## hienghigh   0.490157708 1.368719 2.649476e-01 0.90680021
+## agespan50   1.710737260 1.663102 6.312223e-01 4.63643632
+## agespan60   2.927691811 1.643254 1.105972e+00 7.75008735
+## jobNumber1  1.545112410 1.501852 6.962588e-01 3.42885793
+## jobNumber2  0.871175509 1.450398 4.203306e-01 1.80559478
+## bmi         1.076677746 1.049711 9.790139e-01 1.18408426</code></pre>
+<p>The effect of high energy intake is somewhat confounded by age, but also confounded by job and bmi. What assumption is being made about the shape of the baseline hazard (HINT: the baseline hazard takes the shape of the timescale)?</p>
 <p><strong>(e)</strong> Secondly, do the same analysis, but now adjust for the timescale time-since-entry.</p>
 <pre class="r"><code>diet.spl.t_entry &lt;- survSplit(diet, cut=c(0, 5, 10, 15, 22), end=&quot;t_entry&quot;, start=&quot;start&quot;, event=&quot;chd&quot;)
-diet.spl.t_entry %&gt;% filter(id&lt;=3) %&gt;% arrange(id, t_entry)</code></pre>
-<pre><code>##   id chd        y hieng  energy    job month   height   weight        doe
-## 1  1   0 12.29295  high 2873.95 driver     8 175.3870 71.48737 1964-08-16
-## 2  1   0 12.29295  high 2873.95 driver     8 175.3870 71.48737 1964-08-16
-## 3  1   0 12.29295  high 2873.95 driver     8 175.3870 71.48737 1964-08-16
-## 4  2   0 11.95893   low 1982.34 driver    12 164.2872 70.08120 1964-12-16
-## 5  2   0 11.95893   low 1982.34 driver    12 164.2872 70.08120 1964-12-16
-## 6  2   0 11.95893   low 1982.34 driver    12 164.2872 70.08120 1964-12-16
-## 7  3   0 11.04175   low 2668.58 driver    11 169.3926 71.89560 1965-11-16
-## 8  3   0 11.04175   low 2668.58 driver    11 169.3926 71.89560 1965-11-16
-## 9  3   0 11.04175   low 2668.58 driver    11 169.3926 71.89560 1965-11-16
-##          dox        dob  att_age  t_entry        y1k      bmi jobNumber
-## 1 1976-12-01 1915-01-04 61.90998  5.00000 0.01229295 23.23991         0
-## 2 1976-12-01 1915-01-04 61.90998 10.00000 0.01229295 23.23991         0
-## 3 1976-12-01 1915-01-04 61.90998 12.29329 0.01229295 23.23991         0
-## 4 1976-12-01 1914-06-03 62.49863  5.00000 0.01195893 25.96534         0
-## 5 1976-12-01 1914-06-03 62.49863 10.00000 0.01195893 25.96534         0
-## 6 1976-12-01 1914-06-03 62.49863 11.95926 0.01195893 25.96534         0
-## 7 1976-12-01 1907-02-03 69.82806  5.00000 0.01104175 25.05610         0
-## 8 1976-12-01 1907-02-03 69.82806 10.00000 0.01104175 25.05610         0
-## 9 1976-12-01 1907-02-03 69.82806 11.04205 0.01104175 25.05610         0
-##   start
-## 1     0
-## 2     5
-## 3    10
-## 4     0
-## 5     5
-## 6    10
-## 7     0
-## 8     5
-## 9    10</code></pre>
+
+##Tabulate ageband
+diet.spl.t_entry %&gt;% select(id, start, t_entry, y) %&gt;% filter(id&lt;=3) %&gt;% arrange(id, t_entry)</code></pre>
+<pre><code>##   id start  t_entry        y
+## 1  1     0  5.00000 12.29295
+## 2  1     5 10.00000 12.29295
+## 3  1    10 12.29329 12.29295
+## 4  2     0  5.00000 11.95893
+## 5  2     5 10.00000 11.95893
+## 6  2    10 11.95926 11.95893
+## 7  3     0  5.00000 11.04175
+## 8  3     5 10.00000 11.04175
+## 9  3    10 11.04205 11.04175</code></pre>
 <pre class="r"><code>diet.spl.t_entry &lt;- mutate(diet.spl.t_entry,
                            fu = as.factor(start) ,
                            risk_time = (t_entry-start))
 
-diet.spl.t_entry %&gt;% filter(id&lt;=3) %&gt;% arrange(id, t_entry)</code></pre>
-<pre><code>##   id chd        y hieng  energy    job month   height   weight        doe
-## 1  1   0 12.29295  high 2873.95 driver     8 175.3870 71.48737 1964-08-16
-## 2  1   0 12.29295  high 2873.95 driver     8 175.3870 71.48737 1964-08-16
-## 3  1   0 12.29295  high 2873.95 driver     8 175.3870 71.48737 1964-08-16
-## 4  2   0 11.95893   low 1982.34 driver    12 164.2872 70.08120 1964-12-16
-## 5  2   0 11.95893   low 1982.34 driver    12 164.2872 70.08120 1964-12-16
-## 6  2   0 11.95893   low 1982.34 driver    12 164.2872 70.08120 1964-12-16
-## 7  3   0 11.04175   low 2668.58 driver    11 169.3926 71.89560 1965-11-16
-## 8  3   0 11.04175   low 2668.58 driver    11 169.3926 71.89560 1965-11-16
-## 9  3   0 11.04175   low 2668.58 driver    11 169.3926 71.89560 1965-11-16
-##          dox        dob  att_age  t_entry        y1k      bmi jobNumber
-## 1 1976-12-01 1915-01-04 61.90998  5.00000 0.01229295 23.23991         0
-## 2 1976-12-01 1915-01-04 61.90998 10.00000 0.01229295 23.23991         0
-## 3 1976-12-01 1915-01-04 61.90998 12.29329 0.01229295 23.23991         0
-## 4 1976-12-01 1914-06-03 62.49863  5.00000 0.01195893 25.96534         0
-## 5 1976-12-01 1914-06-03 62.49863 10.00000 0.01195893 25.96534         0
-## 6 1976-12-01 1914-06-03 62.49863 11.95926 0.01195893 25.96534         0
-## 7 1976-12-01 1907-02-03 69.82806  5.00000 0.01104175 25.05610         0
-## 8 1976-12-01 1907-02-03 69.82806 10.00000 0.01104175 25.05610         0
-## 9 1976-12-01 1907-02-03 69.82806 11.04205 0.01104175 25.05610         0
-##   start fu risk_time
-## 1     0  0  5.000000
-## 2     5  5  5.000000
-## 3    10 10  2.293287
-## 4     0  0  5.000000
-## 5     5  5  5.000000
-## 6    10 10  1.959260
-## 7     0  0  5.000000
-## 8     5  5  5.000000
-## 9    10 10  1.042055</code></pre>
+##Tabulate ageband including risk_time
+diet.spl.t_entry %&gt;% select(id, start, t_entry, y, risk_time) %&gt;% filter(id&lt;=3) %&gt;% arrange(id, t_entry)</code></pre>
+<pre><code>##   id start  t_entry        y risk_time
+## 1  1     0  5.00000 12.29295  5.000000
+## 2  1     5 10.00000 12.29295  5.000000
+## 3  1    10 12.29329 12.29295  2.293287
+## 4  2     0  5.00000 11.95893  5.000000
+## 5  2     5 10.00000 11.95893  5.000000
+## 6  2    10 11.95926 11.95893  1.959260
+## 7  3     0  5.00000 11.04175  5.000000
+## 8  3     5 10.00000 11.04175  5.000000
+## 9  3    10 11.04205 11.04175  1.042055</code></pre>
 <pre class="r"><code>poisson8e1 &lt;- glm( chd ~ fu + hieng + offset( log( risk_time) ),
                  family=poisson,
                  data=diet.spl.t_entry )
 
-summary( poisson8e1 )</code></pre>
+summary(poisson8e1)</code></pre>
 <pre><code>## 
 ## Call:
 ## glm(formula = chd ~ fu + hieng + offset(log(risk_time)), family = poisson, 
@@ -297,9 +393,7 @@ summary( poisson8e1 )</code></pre>
 ## AIC: 487.52
 ## 
 ## Number of Fisher Scoring iterations: 6</code></pre>
-<pre class="r"><code>## IRR
-
-IRR(poisson8e1)</code></pre>
+<pre class="r"><code>IRR(poisson8e1)</code></pre>
 <pre><code>##                    IRR Std. err    CI_lower   CI_upper
 ## (Intercept) 0.01412826 1.309093 0.008333485 0.02395249
 ## fu5         0.79160514 1.457978 0.378056495 1.65752659

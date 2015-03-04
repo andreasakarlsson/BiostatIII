@@ -7,7 +7,7 @@ Laboratory exercise 8
 Author: Annika Tillander, 2014-01-30  
 Edited: Andreas Karlsson, 2015-03-01  
         Benedicte Delcoigne, 2015-03-03  
-		Johan Zetterqvist, 2015-03-04
+        Johan Zetterqvist, 2015-03-04
 
 ## Diet data: Using Poisson regression to study the effect of energy intake adjusting for confounders on two different timescales
 
@@ -61,7 +61,26 @@ Plot the CHD incidence rates by attained age.
 ```{r 8c_ir,  message=FALSE}
 ```
 
-**(d)** This is work in progress, please look at the stata code for now.
+**(d)** Now fit the model for CHD, both without and with the adjustment for job and bmi. Is the effect of hieng on CHD confounded by age, BMI or job? Write the linear predictors using pen and paper.
+
+Firstly, let’s adjust for the timescale attained age. To do this in Poisson regression you must split the data on timescale age. The risktime variable contains the correct amount of risktime for each timeband.
+
+
+```{r 8d_agebands,  message=FALSE}
+```
+
+Fitting the model for CHD, without adjustment for job and bmi.
+
+
+```{r 8d_model1,  message=FALSE}
+```
+
+Fitting the model for CHD, with adjustment for job and bmi.
+
+```{r 8d_model2,  message=FALSE}
+```
+
+The effect of high energy intake is somewhat confounded by age, but also confounded by job and bmi. What assumption is being made about the shape of the baseline hazard (HINT: the baseline hazard takes the shape of the timescale)?
 
 
 **(e)** Secondly, do the same analysis, but now adjust for the timescale time-since-entry.

@@ -92,39 +92,75 @@ poisson8c <- glm( chd ~ hieng + jobNumber + bmi + offset( log( y1k ) ), family=p
 summary(poisson8c)
 exp(cbind(coef(poisson8c),confint(poisson8c)))
 
+##########################################################
 
-## @knitr 8d
-#timeBand <- survSplit(diet, cut=c(0,30,60,72), end="doxNum", start="doeNum", event="chd")
+## @knitr 8d_agebands
+## Create a variable for age at entry
+diet <- mutate(diet, entry_age = as.numeric( doe - dob ) / 365.24)
+
+## Split time at 30,50,60 and 72 with time scale age at entry to attained age, the zero=0 makes output be in absolute age
+diet.spl.dob <- survSplit(diet, cut=c(30,50,60,72), end="att_age", start="entry_age", event="chd", zero = 0)
+
+## Tabulate ageband
+diet.spl.dob %>% select(id, entry_age, att_age, y) %>% filter(id<=3) %>% arrange(id, entry_age)
+
+## Create an agespan variable
+diet.spl.dob <- mutate(diet.spl.dob,
+                       agespan = NA,
+                       agespan = ifelse( entry_age>=30 & entry_age <50 , 30, agespan),
+                       agespan = ifelse( entry_age>=50 & entry_age <60 , 50, agespan),
+                       agespan = ifelse( entry_age>=60 & entry_age <72, 60, agespan))
+
+## Make the numeric variables factors since we want to model them with dummie variables and calculate time at risk
+diet.spl.dob <- mutate(diet.spl.dob,
+                       agespan = as.factor(agespan),
+                       jobNumber = as.factor(jobNumber),
+                       risk_time = (att_age - entry_age))
+
+## Tabulate ageband including risk_time
+diet.spl.dob %>% select(id,  entry_age, att_age, y,risk_time) %>% filter(id<=3) %>% arrange(id, entry_age)
 
 
-timeBand <- survSplit(diet, cut=c(0,30,60,72), end="att_age", start="start", event="chd")
+## Tabulate number of events per agespan
+diet.spl.dob %>%
+    group_by(agespan) %>%
+    summarise(noFailure=sum(chd==0), Failure=sum(chd), Total=n())
 
-## recode start time as a factor
-timeBand <- mutate(diet, fu = as.factor(start))
+## @knitr 8d_model1
+poisson8d <- glm( chd ~ hieng + agespan + offset( log( risk_time) ),
+                 family=poisson,
+                 data=diet.spl.dob)
 
-## Output the first three individuals
-timeBand %>% select(id, ) %>% filter(id<=3) %>% arrange(id, att_age)
+summary(poisson8d)
+IRR(poisson8d)
 
+## @knitr 8d_model2
+poisson8d <- glm( chd ~ hieng + agespan + jobNumber + bmi + offset( log( risk_time) ),
+                 family=poisson,
+                 data=diet.spl.dob)
+
+summary(poisson8d)
+IRR(poisson8d)
 
 ## @knitr 8.e.i
 
 diet.spl.t_entry <- survSplit(diet, cut=c(0, 5, 10, 15, 22), end="t_entry", start="start", event="chd")
-diet.spl.t_entry %>% filter(id<=3) %>% arrange(id, t_entry)
+
+##Tabulate ageband
+diet.spl.t_entry %>% select(id, start, t_entry, y) %>% filter(id<=3) %>% arrange(id, t_entry)
 
 diet.spl.t_entry <- mutate(diet.spl.t_entry,
                            fu = as.factor(start) ,
                            risk_time = (t_entry-start))
 
-diet.spl.t_entry %>% filter(id<=3) %>% arrange(id, t_entry)
+##Tabulate ageband including risk_time
+diet.spl.t_entry %>% select(id, start, t_entry, y, risk_time) %>% filter(id<=3) %>% arrange(id, t_entry)
 
 poisson8e1 <- glm( chd ~ fu + hieng + offset( log( risk_time) ),
                  family=poisson,
                  data=diet.spl.t_entry )
 
-summary( poisson8e1 )
-
-## IRR
-
+summary(poisson8e1)
 IRR(poisson8e1)
 
 ## @knitr 8.e.ii
@@ -132,9 +168,7 @@ poisson8e2 <- glm( chd ~ fu + hieng + job + bmi + offset( log( t_entry) ),
                  family=poisson,
                  data=diet.spl.t_entry )
 
-summary( poisson8e2 )
-
-## IRR
+summary(poisson8e2)
 IRR(poisson8e2)
 
 
