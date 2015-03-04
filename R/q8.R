@@ -106,8 +106,7 @@ timeBand <- mutate(diet, fu = as.factor(start))
 timeBand %>% select(id, ) %>% filter(id<=3) %>% arrange(id, att_age)
 
 
-## This was correct ysester day!!!
-## @knitr 8e
+## @knitr 8.e.i
 
 diet.spl.t_entry <- survSplit(diet, cut=c(0, 5, 10, 15, 22), end="t_entry", start="start", event="chd")
 diet.spl.t_entry %>% filter(id<=3) %>% arrange(id, t_entry)
@@ -115,6 +114,8 @@ diet.spl.t_entry %>% filter(id<=3) %>% arrange(id, t_entry)
 diet.spl.t_entry <- mutate(diet.spl.t_entry,
                            fu = as.factor(start) ,
                            risk_time = (t_entry-start))
+
+diet.spl.t_entry %>% filter(id<=3) %>% arrange(id, t_entry)
 
 poisson8e1 <- glm( chd ~ fu + hieng + offset( log( risk_time) ),
                  family=poisson,
@@ -126,7 +127,8 @@ summary( poisson8e1 )
 
 IRR(poisson8e1)
 
-poisson8e2 <- glm( chd ~ fu + hieng + jobNumber + bmi + offset( log( t_entry) ),
+## @knitr 8.e.ii
+poisson8e2 <- glm( chd ~ fu + hieng + job + bmi + offset( log( t_entry) ),
                  family=poisson,
                  data=diet.spl.t_entry )
 
@@ -136,6 +138,3 @@ summary( poisson8e2 )
 IRR(poisson8e2)
 
 
-
-tmp <- survSplit(diet, cut=c(0,30,60,72), end="att_age", start="start",
-                           event="chd")

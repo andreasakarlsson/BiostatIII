@@ -61,8 +61,14 @@ Plot the CHD incidence rates by attained age.
 ```{r 8c_ir,  message=FALSE}
 ```
 
+**(d)** This is work in progress, please look at the stata code for now.
 
 
+**(e)** Secondly, do the same analysis, but now adjust for the timescale time-since-entry.
+
+```{r 8.e.i,  message=FALSE}
+```
+Compare the results with the analysis adjusted for attained age. Are there any differences? Why (or why not)? Go back to the graphs at the beginning of the exercise and look for explanations.
 
 
 
