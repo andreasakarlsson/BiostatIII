@@ -4,7 +4,7 @@ Laboratory exercise 7
 -----------
 
 ### Suggested solutions by
-Author: Johan Zetterqvis, 2015-03-03
+Author: Johan Zetterqvist, 2015-03-03
 
 
 ## Model cause-specific mortality with poisson regression

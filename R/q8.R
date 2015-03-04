@@ -17,14 +17,10 @@
 ###############################################################################
 ## @knitr loadDependecies
 require(survival)
-require(epiR)
 require(foreign) #Needed to read data set from Stata
 require(ggplot2)
 require(dplyr)
-require(readstata13) #Needed to read data set from Stata 13
 require(muhaz) #for hazard estimates
-require(GGally)
-require(gridExtra)
 
 
 ###########################################
@@ -55,17 +51,16 @@ summary(diet$att_age)
 
 
 ## @knitr 8a1_Haz_att_age
-## Run muhaz smoother for Kaplan-Meier hazards ones per strata
+## Run muhaz smoother for Kaplan-Meier hazards ones per strata, note that this is left censured data and the muhaz smoother is not made for this.
 dietHiengAge <- diet %>%  group_by(hieng) %>%
     do( h = muhaz(times = .$att_age, delta = .$chd, min.time = min(.$att_age[as.logical(.$chd)]), max.time = max(.$att_age[as.logical(.$chd)])-2)) %>%
     do( data.frame(Hazard = .$h$haz.est, Time = .$h$est.grid, Strata = .$hieng))
 ggplot(dietHiengAge, aes(x=Time, y=Hazard, colour= Strata)) +
     geom_line() + ggtitle("Smoothed Hazard estimates") + theme(legend.position="bottom")
 
-## @knitr nonSmoothedHaz 
 ## Have a look at the raw hazard if you dare...
-hazard <- data.frame(with( diet, kphaz.fit(time=att_age, status=chd, strata=hieng)))
-ggplot(hazard, aes(time, haz, group=strata, color=factor(strata))) + geom_point()
+## hazard <- data.frame(with( diet, kphaz.fit(time=att_age, status=chd, strata=hieng)))
+## ggplot(hazard, aes(time, haz, group=strata, color=factor(strata))) + geom_point()
 
 ## @knitr 8a2_Haz_time_entry
 diet <- diet %>% mutate(t_entry = as.numeric(dox - doe) / 365.24)
@@ -96,6 +91,19 @@ diet <- diet %>% mutate(jobNumber = match(job, c("driver","conductor","bank")) -
 poisson8c <- glm( chd ~ hieng + jobNumber + bmi + offset( log( y1k ) ), family=poisson, data=diet)
 summary(poisson8c)
 exp(cbind(coef(poisson8c),confint(poisson8c)))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
