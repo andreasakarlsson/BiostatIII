@@ -1,83 +1,158 @@
-# Date: 2014-02-06
-# Purpose: To do the solution for Biostat III exercise 9 in R
-# Author: Annika Tillander
+## Date: 2015-03-03
+## Purpose: To do the solution for Biostat III exercise 9 in R
+## Author: Annika Tillander,  Johan Zetterqvist
 ###############################################################################
 
-#Load the needed packages needs to be done each session
+
+###############################################################################
+## Exercise 9
+###############################################################################
+
+## Install needed packages only need to be done once
+## install.packages("foreign")
+## install.packages("muhaz")
+## install.packages("car")
+
 require(survival)
-require(KMsurv)
-require(foreign) #Needed to read data set from Stata
-require(nlme) #for gsummary
-require(muhaz) #for hazards
+require(dplyr)
+require(readstata13)
+
+
+###########################################
+### A help function to calculate ###
+### and print incidence (hazard) ratios
+### from a fitted poisson regression
+### from glm
+###########################################
+
+IRR <- function(fit){
+    summfit <- summary(fit )$coefficients
+    IRfit <- exp( cbind( summfit[, 1:2], summfit[, 1] - 1.96*summfit[, 2], summfit[, 1] +
+                        1.96*summfit[, 2] ) )
+    colnames(IRfit) <- c("IRR", "Std. err", "CI_lower", "CI_upper")
+    print(IRfit)
+
+}
+
 ###############################################################################
 #Exercise 9
 ###############################################################################
 
-#The data
-melanoma <- read.dta("http://biostat3.net/download/melanoma.dta")
-melanoma_sub <- melanoma[melanoma$stage=="Localised",]
 
-#Construct a variable for starting time
-start_time <- rep(0, length(melanoma_sub$status))
-#Recode the status variabel 
-death_cancer <- NA 
-death_cancer[melanoma_sub$status =="Dead: cancer"] <- 1
-death_cancer[melanoma_sub$status =="Dead: other" | melanoma_sub$status == "Alive" | melanoma_sub$status == "Lost to follow-up"] <- 0
-death_all <- NA 
-death_all[melanoma_sub$status =="Dead: cancer"|melanoma_sub$status =="Dead: other"] <- 1
-death_all[melanoma_sub$status == "Alive" | melanoma_sub$status == "Lost to follow-up"] <- 0
+## Read melanoma data
+## and select subcohorts
 
-#Add the start time and cancer death to the data
-melanoma3 <- data.frame(cbind(melanoma_sub, death_cancer, death_all, start_time))
+melanoma.l <-
+
+    tbl_df( read.dta13("http://biostat3.net/download/melanoma.dta") ) %>%
+
+    filter(stage=="Localised") %>%
+
+    mutate(## Create a death indicator
+           death_cancer = as.numeric(status=="Dead: cancer"))
 
 
-# Patients who survived more than 10 years are censored at 10 years
-melanoma3$death_cancer[melanoma3$surv_mm>120] <- 0
-melanoma3$exit[melanoma3$surv_mm>120] <- melanoma3$dx[melanoma3$surv_mm>120] + 10
-melanoma3$surv_yy[melanoma3$surv_mm>120] <- 10
-melanoma3$surv_mm[melanoma3$surv_mm>120] <- 120
-
-# Cox regression with time-since-entry as the timescale
-# Note that R uses the Efron method for approximating the likelihood in the presence
-# whereas Stata (and most other software) use the Breslow method
-cox1 <- coxph(Surv(surv_mm, death_cancer==1) ~ 1 + year8594, method=c("breslow"), data=melanoma3)
-summary(cox1)
-
-#a
-#b
-
-#c
-#Cox regression
-cox2 <- coxph(Surv(surv_mm, death_cancer==1) ~ 1 + sex + year8594 + agegrp, method=c("breslow"), data=melanoma3)
-summary(cox2)
-#iii ???? I have not found a Wald test for the global effect of age only how to test for each category of age ...
-#Test for each covariate
-cox.zph(cox2)
-#Tests if there is a difference between two or more survival curves
-survdiff(Surv(surv_mm, death_cancer==1) ~ 1 + agegrp, data=melanoma3)
-survdiff(Surv(surv_mm, death_cancer==1) ~ 1 + sex + year8594 + agegrp, data=melanoma3)
-survdiff(Surv(surv_mm, death_cancer==1) ~ 1 + sex + year8594, data=melanoma3)
-
-#d
-#The model without agegrp
-cox3 <- coxph(Surv(surv_mm, death_cancer==1) ~ 1 + sex + year8594, method=c("breslow"), data=melanoma3)
-#Likelihood ratio test for overall effect of age
-anova(cox2, cox3)
-
-#e
-#Given a survival data set and a set of specified cut times, split each record into multiple subrecords at each cut time. The new data set will be in ‘counting process’ format, with a start time, stop time, and event status for each record.
-melanoma4 <- survSplit(melanoma3, cut=c(0, 12*(1:9)), end="surv_mm", start="start_time", event="death_cancer", episode="i")
-melanoma4$start_time <- as.factor(melanoma4$start_time)
-#Poisson regression
-pos_fit <- glm(death_cancer ~ sex + year8594 + agegrp + start_time, family=poisson, data=melanoma4)
-summary(pos_fit)
 
 
-#Table for comparison between Cox and Poisson
-hazratio_pois <- exp(coef(pos_fit))
-#Confidence interval
-CI_p <- exp(confint(pos_fit))
-CI_c <- exp(confint(cox2))
-cox_tab <- cbind(summary(cox2)$coefficients[,c(2,4,5)], CI_c)
-poisson_tab <- cbind(hazratio_pois, summary(pos_fit)$coefficients[,3:4], CI_p)
-round(rbind(cox_tab, poisson_tab[2:6,]), 3)
+melanoma.l2 <-
+
+    mutate(melanoma.l,
+           ## Create a death indicator (only count deaths within 120 months)
+           death_cancer = death_cancer * as.numeric( surv_mm <= 120),
+           ## Create a new time variable
+           surv_mm = pmin(surv_mm, 120))
+
+
+## 9.a
+
+summary( coxfit9a <- coxph(Surv(surv_mm, death_cancer) ~ year8594,
+                           data = melanoma.l2) )
+
+## 9.b
+
+summary( coxfit3c <- coxph(Surv(surv_mm, death_cancer) ~ year8594,
+                           data = melanoma.l) )
+
+## 9.c
+
+summary( coxfit9c <- coxph(Surv(surv_mm, death_cancer) ~ year8594 + sex + agegrp,
+                           data = melanoma.l2) )
+
+## 9.d
+## Test if the effect of age is significant
+## Use a Wald test with the car package
+require(car)
+linearHypothesis(coxfit9c,c("agegrp45-59 = 0","agegrp60-74 = 0","agegrp75+ = 0"))
+
+## 9.d
+
+## Test if the effect of age is significant
+## Use an LR test with the anova function
+## The model without agegrp
+summary( coxfit9d <- coxph(Surv(surv_mm, death_cancer) ~ year8594 + sex,
+                           data = melanoma.l2) )
+## LR test
+anova(coxfit9c, coxfit9d)
+
+## 9.e
+
+summary( coxfit9e <- coxph(Surv(surv_mm, death_cancer) ~ year8594 + sex + agegrp,
+                           data = melanoma.l2) )
+
+## Split follow up by year
+melanoma.spl <- survSplit(melanoma.l2, cut=12*(0:10), end="surv_mm", start="start",
+                           event="death_cancer")
+
+## recode start time as a factor
+melanoma.spl <- mutate(melanoma.spl,
+                       fu = as.factor(start) )
+
+## Run Poisson regression
+summary(poisson9e <- glm( death_cancer ~ fu + year8594 + sex + agegrp + offset( log(surv_mm) ),
+                         family = poisson,
+                         data = melanoma.spl ))
+
+## IRR
+IRR(poisson9e)
+
+summary(coxfit9e)
+
+## 9.f
+
+sfit9f <- survfit(Surv(surv_mm, event=death_cancer) ~ 1,
+                  data = melanoma.l2 )
+
+## Have a look at the fitted object
+str(sfit9f, 1)
+
+head(sfit9f$time)
+
+## Split follow up by year
+melanoma.spl2 <- survSplit(melanoma.l2, cut=sfit9f$time, end="surv_mm", start="start",
+                           event="death_cancer")
+
+## recode start time as a factor
+melanoma.spl2 <- mutate(melanoma.spl2,
+                       fu = as.factor(start) )
+
+## Run Poisson regression
+poisson9f <- glm( death_cancer ~ fu + year8594 + sex + agegrp + offset( log(surv_mm) ),
+                         family = poisson,
+                         data = melanoma.spl2 )
+
+## IRR
+coef9f <- summary(poisson9f)$coefficients
+## We are not interested in nuisance parameters fu1, fu2, etc
+npar <- dim(coef9f)[1]
+pars <- (npar-4):npar
+IRfit9f <- exp( cbind( coef9f[pars, 1:2], coef9f[pars, 1] - 1.96*coef9f[pars, 2], coef9f[pars, 1] +
+                        1.96*coef9f[pars, 2] ) )
+colnames(IRfit9f) <- c("IRR", "Std. err", "CI_lower", "CI_upper")
+IRfit9f
+
+summary(coxfit9e)
+
+## 9.g
+
+
+

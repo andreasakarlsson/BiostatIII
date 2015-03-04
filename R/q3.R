@@ -1,6 +1,6 @@
-# Purpose: To do the solution for Biostat III exercises in R
-# Author: Annika Tillander, 2014-01-30
-# Edited: Andreas Karlsson, 2015-02-28
+## Purpose: To do the solution for Biostat III exercises in R
+## Author: Annika Tillander, 2014-01-30
+## Edited: Andreas Karlsson, 2015-02-28
 ###############################################################################
 
 ## Install needed packages only need to be done once

@@ -1,0 +1,134 @@
+Biostat III exercises in R
+===========
+Laboratory exercise 7
+-----------
+
+### Suggested solutions by
+Author: Johan Zetterqvis, 2015-03-03
+
+
+## Model cause-specific mortality with poisson regression
+
+In this exercise we model, using Poisson regression, cause-specific mortality of patients diagnosed with localised (stage==1) melanoma.
+
+In exercise 9 we model cause-specific mortality using Cox regression and in exercise 28 we use flexible parametric models. The aim is to illustrate that these three methods are very similar.
+
+The aim of these exercises is to explore the similarities and differences to these three approaches to modelling. We will be comparing the results (and their interpretation) as we proceed through the exercises.
+
+-----------
+
+Load the diet data using time-on-study as the timescale.
+
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
+library('knitr')	
+read_chunk('q7.R')
+opts_chunk$set(cache=FALSE)
+```
+
+You may have to install the required packages the first time you use them. You can install a package by `install.packages("package_of_interest")` for each package you require.
+
+```{r loadDependecies, message=FALSE}
+```
+Load the melanoma data and explore it.
+
+```{r loadPreprocess, results='hide'}
+```
+
+Rates can be modelled on different timescales, e.g., attained age, time-since-entry, calendar time. Plot the CHD incidence rates both by attained age and by time-since-entry. Is there a difference? Do the same for CHD hazard by different energy intakes (hieng).
+
+**(a)**
+
+**(i.)** Plot Kaplan-Meier estimates of cause-specific survival as a function of calendar period of diagnosis.
+
+```{r 7.a.i,  message=FALSE}
+```
+
+**(ii.)** Now plot the estimated hazard function (cause-specific mortality rate) as a function of calendar period of diagnosis.
+
+```{r 7.a.ii,  message=FALSE}
+```
+During which calendar period (the early or the latter) is mortality the lowest?
+
+**(iii.)** Is the interpretation (with respect to how prognosis depends on period) based on the hazard consistent with the interpretation of the survival plot?
+
+```{r 7.a.iii,  message=FALSE}
+```
+
+**(b)** Estimate the cause-specific mortality rate for each calendar period.
+
+```{r 7.b,  message=FALSE}
+```
+
+During which calendar period (the early or the latter) is mortality the lowest? Is this consistent with what you found earlier? If not, why the inconsistency?
+
+**(c)** The reason for the inconsistency between parts 7a and 7b was confounding by time since diagnosis. The comparison in part 7a was adjusted for time since diagnosis (since we compare the differences between the curves at each point in time) whereas the comparison in part 7b was not. Understanding this concept is central to the remainder of the exercise so please ask for help if you don’t follow.
+
+Two approaches for controlling for confounding are ‘restriction’ and ‘statistical adjustment’. We will first use restriction to control for confounding. We will restrict the potential follow-up time to a maximum of 120 months. Individuals who survive more than 120 months are censored at 120 months.
+
+```{r 7.c.i,  message=FALSE}
+```
+
+
+
+```{r 7.c.ii,  message=FALSE}
+```
+
+
+
+```{r 7.d,  message=FALSE}
+```
+
+
+
+```{r 7.e,  message=FALSE}
+```
+
+
+
+```{r 7.f,  message=FALSE}
+```
+
+
+
+```{r 7.g,  message=FALSE}
+```
+
+
+
+```{r 7.h,  message=FALSE}
+```
+
+
+
+```{r 7.i,  message=FALSE}
+```
+
+
+
+```{r 7.j,  message=FALSE}
+```
+
+
+
+```{r 7.k.i,  message=FALSE}
+```
+
+
+
+```{r 7.k.ii,  message=FALSE}
+```
+
+
+
+```{r 7.k.iii,  message=FALSE}
+```
+
+
+
+```{r 7.k.iv,  message=FALSE}
+```
+
+
+
+```{r 7.l,  message=FALSE}
+```
