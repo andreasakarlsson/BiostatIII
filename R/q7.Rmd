@@ -29,6 +29,7 @@ You may have to install the required packages the first time you use them. You c
 
 ```{r loadDependecies, message=FALSE}
 ```
+
 Load the melanoma data and explore it.
 
 ```{r loadPreprocess, results='hide'}
@@ -51,7 +52,7 @@ During which calendar period (the early or the latter) is mortality the lowest?
 iii. Is the interpretation (with respect to how prognosis depends on period) based on the hazard consistent with the interpretation of the survival plot?
 
 ```{r 7.a.iii,  message=FALSE}
-```
+```	
 
 **(b)** Estimate the cause-specific mortality rate for each calendar period.
 
@@ -90,12 +91,14 @@ iii. Now use Poisson regression to estimate the same mortality rate ratio. Write
 
 ```{r 7.e,  message=FALSE}
 ```
+
 Mortality appears to be quite low during the first year of follow-up. Does this seem reasonable considering the disease with which these patients have been diagnosed?
 
 **(f)** Compare the plot of the estimated rates to a plot of the hazard rate as a function of continuous time.
 
-```{r 7.f,  message=FALSE}
+```{r 7.f,  message=FALSE, warning=FALSE}
 ```
+
 Is the interpretation similar? Do you think it is sufficient to classify follow-up time into annual intervals or might it be preferable to use, for example, narrower intervals?
 
 **(g)** Use Poisson regression to estimate incidence rate ratios as a function of follow-up time. Write the linear predictor using pen and paper.
@@ -119,7 +122,7 @@ i. Interpret the estimated hazard ratio for the parameter labelled agegrp 2, inc
 ii. Is the effect of calendar period strongly confounded by age and sex? That is, does the inclusion of sex and age in the model change the estimate for the effect of calendar period?
 iii. Perform a Wald test of the overall effect of age and interpret the results.
 
-```{r 7.i,  message=FALSE}
+```{r 7.i,  message=FALSE, warning=FALSE}
 ```
 
 **(j)** Is the effect of sex modified by calendar period (whilst adjusting for age and follow-up)? Fit an appropriate interaction term to test this hypothesis. Write the linear predictor using pen and paper.
@@ -132,25 +135,35 @@ iii. Perform a Wald test of the overall effect of age and interpret the results.
 
 ADVANCED: Do this with each of the following methods and confirm that the results are the same:
 
+i. Using hand-calculation on the estimates from exercise 7j.
+
 ```{r 7.k.i,  message=FALSE}
 ```
-
+ii. Using the estimates from exercise 7j.
 
 
 ```{r 7.k.ii,  message=FALSE}
 ```
 
+iii. Creating appropriate dummy variables that represent the effects of sex for each calendar period.
 
 
 ```{r 7.k.iii,  message=FALSE}
 ```
 
+Write the linear predictor using pen and paper.
 
+
+iv. Using syntax available from Stata 11 and onwards to repeat the previous model.
 
 ```{r 7.k.iv,  message=FALSE}
 ```
+Using syntax available from Stata 11 and onwards to repeat the previous model.
 
+**(l)** Now fit a separate model for each calendar period in order to estimate the hazard ratio for the effect of sex (with 95% confidence interval) for each calendar period.
 
+Why do the estimates differ from those you obtained in the previous part?
 
 ```{r 7.l,  message=FALSE}
 ```
+Can you fit a single model that reproduces the estimates you obtained from the stratified models?

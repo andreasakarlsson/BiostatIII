@@ -102,10 +102,6 @@ hazfit7a.late <- with(melanoma.l,
                             subset=year8594=="Diagnosed 85-94",
                             max.time=max(surv_yy1)))
 
-# Plot smoothed hazards
-plot(hazfit7a.early)
-lines(hazfit7a.late)
-
 ## With bells and whistles
 plot(hazfit7a.early,xlab="Years since diagnose",col="blue",lty="solid")
 lines(hazfit7a.late,col="red",lty="dashed")
@@ -317,10 +313,10 @@ IRR(poisson7i)
 ## For this we use the car package
 require(car)
 linearHypothesis(poisson7i,c("agegrp45-59 = 0","agegrp60-74 = 0","agegrp75+ = 0"))
-# ADVANCED:
-# Alternative by comparing deviances
-# poisson7i_2 <- update(poisson7i,. ~ . - agegrp)
-# anova(poisson7i_2,poisson7i,test="Chisq")
+## ADVANCED:
+## Alternative by comparing deviances
+## poisson7i_2 <- update(poisson7i,. ~ . - agegrp)
+## anova(poisson7i_2,poisson7i,test="Chisq")
 
 ## @knitr 7.j
 
@@ -343,7 +339,7 @@ linearHypothesis(poisson7j,c("sexFemale = 0","year8594Diagnosed 85-94:sexFemale 
 # use estimates with covariance matrix from glm
 # to obtain estimates with ci's
 length(coef(poisson7j))
-linvec <- c(rep(0,15),c(1,1))
+linvec <- c(rep(0,14),c(1,1))
 coef.Female8594 <- crossprod(coef(poisson7j),linvec)
 var.Female8594 <- t(linvec)%*%vcov(poisson7j)%*%linvec
 ci.d <- 1.96*sqrt(var.Female8594)
