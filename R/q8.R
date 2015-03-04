@@ -93,22 +93,6 @@ summary(poisson8c)
 exp(cbind(coef(poisson8c),confint(poisson8c)))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## There is some thing fishy here - check the times!!!
-
 ## @knitr 8d
 #timeBand <- survSplit(diet, cut=c(0,30,60,72), end="doxNum", start="doeNum", event="chd")
 
@@ -120,14 +104,6 @@ timeBand <- mutate(diet, fu = as.factor(start))
 
 ## Output the first three individuals
 timeBand %>% select(id, ) %>% filter(id<=3) %>% arrange(id, att_age)
-
-
-## from johan
-
-## @knitr 8d
-
-tmp <- survSplit(diet, cut=c(0,30,60,72), end="att_age", start="start",
-  event="chd")
 
 
 ## This was correct ysester day!!!
