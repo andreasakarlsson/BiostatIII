@@ -67,7 +67,7 @@ img {
 <h2>Laboratory exercise 7</h2>
 <div id="suggested-solutions-by" class="section level3">
 <h3>Suggested solutions by</h3>
-<p>Author: Johan Zetterqvis, 2015-03-03</p>
+<p>Author: Johan Zetterqvist, 2015-03-03</p>
 </div>
 </div>
 <div id="model-cause-specific-mortality-with-poisson-regression" class="section level2">
@@ -667,10 +667,8 @@ IRR(poisson7i)</code></pre>
 ## sexFemale               0.58754651 1.067642 0.516806360 0.66796953</code></pre>
 <pre class="r"><code>## Test if the effect of age is significant
 ## For this we use the car package
-require(car)</code></pre>
-<pre><code>## Warning: no function found corresponding to methods exports from 'SparseM'
-## for: 'coerce'</code></pre>
-<pre class="r"><code>linearHypothesis(poisson7i,c(&quot;agegrp45-59 = 0&quot;,&quot;agegrp60-74 = 0&quot;,&quot;agegrp75+ = 0&quot;))</code></pre>
+require(car)
+linearHypothesis(poisson7i,c(&quot;agegrp45-59 = 0&quot;,&quot;agegrp60-74 = 0&quot;,&quot;agegrp75+ = 0&quot;))</code></pre>
 <pre><code>## Linear hypothesis test
 ## 
 ## Hypothesis:
