@@ -198,6 +198,7 @@ rates_by_diag_yr2[2, "Rate"] / rates_by_diag_yr2[1, "Rate"]
 ## ## MRR truncated data
 ## rates_by_diag_yr2[2, "Rate"] / rates_by_diag_yr2[1, "Rate"]
 
+## @knitr 7.c.iii
 ## Use glm to estimate the rate ratios
 ## we scale the offset term to personyears
 poisson7c <- glm( death_cancer ~ year8594 + offset( log( surv_mm/12/1000 ) ), family=poisson, data=melanoma.l2 )
@@ -334,7 +335,7 @@ hz7k <- exp(coef(poisson7j))
 hz7k["sexFemale"]
 hz7k["sexFemale"]*hz7k["year8594Diagnosed 85-94:sexFemale"]
 
-##  @knitr 7.k.ii
+## @knitr 7.k.ii
 linearHypothesis(poisson7j,c("sexFemale = 0","year8594Diagnosed 85-94:sexFemale = 0"))
 
 # ADVANCED:
@@ -365,8 +366,7 @@ summary(poisson7k <- glm( death_cancer ~ fu + agegrp + year8594 + femaleEarly +
 ## IRR
 IRR(poisson7k)
 
-## @knitr more
-## 7.k.iv
+## @knitr 7.k.iv
 ## Add interaction term
 summary(poisson7k2 <- glm( death_cancer ~ fu + agegrp + year8594 + year8594:sex +
                          offset( log(pt) ), family=poisson,
