@@ -97,9 +97,11 @@ head(melanoma2p8Split)
 cox2p8Split1 <- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594 + agegrp*fu, method=c("breslow"), data=melanoma2p8Split)
 summary(cox2p8Split1)
 
+
 ## @knitr 10.i
-cox2p8Split2 <- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594  + fu*agegrp, method=c("breslow"), data=melanoma2p8Split)
+cox2p8Split2 <- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594 + fu + fu:agegrp, method=c("breslow"), data=melanoma2p8Split)
 summary(cox2p8Split2)
+
 
 ## @knitr 10.hother
 ## Ref: http://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf

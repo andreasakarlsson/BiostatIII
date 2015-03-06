@@ -74,7 +74,8 @@ We see effects of age (i.e., the hazard ratios) for the period 0–2 years subse
 
 **(i)** Often we wish to see the effects of exposure (age) for each level of the modifier (time since diagnosis). That is, we would like to complete the table below with relevant hazard ratios. To get the effects of age for the period 2+ years after diagnosis, using the default parametrization, we must multiply the hazard ratios for 0–2 years by the appropriate interaction effect. Now let’s reparameterise the model to directly estimate the effects of age for each level of time since diagnosis.
 
-This is WIP.
+```{r 10.i}
+```
 
 
 **(j)** ADVANCED: Fit an analogous Poisson regression model. Are the parameter estimates similar? HINT: You will need to split the data by time since diagnosis. No written solutions for this part.
