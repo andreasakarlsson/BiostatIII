@@ -4,15 +4,10 @@
 
 ## Install needed packages only need to be done once
 ## install.packages("survival")
-## install.packages("KMsurv")
 ## install.packages("readstata13")
 ## install.packages("dplyr")
 ## install.packages("ggplot2")
-## install.packages("Gally")
 ## install.packages("muhaz")
-## install.packages("gridExtra")
-## install.packages("RCurl")
-
 
 ###############################################################################
 ## Exercise 10
@@ -74,17 +69,17 @@ summary(cox1)
 
 ## @knitr 10.e
 
-cox2 <- coxph(Surv(trunk_yy, death_cancer==1) ~ agegrp + sex + year8594, method=c("breslow"), data=melanoma)
+cox2 <- coxph(Surv(trunk_yy, death_cancer==1) ~ sex + year8594 + agegrp, method=c("breslow"), data=melanoma)
 summary(cox2)
 
 ## Plot of the scaled Schoenfeld residuals for calendar period 1985–94.
 ## The smooth line shows the estimated log hazard ratio as a function of time.
-strat.cox.red.diag <- cox.zph(cox2, transform="identity") #Stata appears to be using 'identity'
-plot(strat.cox.red.diag[5],resid=TRUE, se=TRUE, main="Schoenfeld residuals", ylim=c(-4,4))
+cox2.phtest <- cox.zph(cox2, transform="identity") #Stata appears to be using 'identity'
+plot(cox2.phtest[2],resid=TRUE, se=TRUE, main="Schoenfeld residuals", ylim=c(-4,4))
 
 ## @knitr 10.g
 ## The results from the previous proportional hazards assumption test
-print(strat.cox.red.diag)
+print(cox2.phtest)
 
 ## @knitr 10.h
 ## Ref: http://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf
@@ -92,11 +87,11 @@ melanoma2p8 <- tmerge(melanoma, melanoma,  id=id, tstart=rep(0, nrow(melanoma)),
 
 head(melanoma2p8)
 
-## This is not look correct!? Chocking!
-cox2p8 <- coxph(Surv(tstart, tstop, death) ~ agegrp * strata(after2) + sex + year8594 + cluster(id), method=c("breslow"), data=melanoma2p8)
+## This is not look correct!? Shocking!
+cox2p8 <- coxph(Surv(tstart, tstop, death) ~ sex + year8594 + agegrp + agegrp:after2  + cluster(id), method=c("breslow"), data=melanoma2p8)
 summary(cox2p8)
 
-## @knitr 10.h
-## This is not look correct!? Chocking!
-cox2p8_2<- coxph(Surv(tstart, tstop, death) ~  sex + year8594 + agegrp * after2 + cluster(id), method=c("breslow"), data=melanoma2p8)
+## @knitr 10.i
+## This is not look correct!? Shocking!
+cox2p8_2<- coxph(Surv(tstart, tstop, death) ~  sex + year8594 + after2 + after2:agegrp + cluster(id), method=c("breslow"), data=melanoma2p8)
 summary(cox2p8_2)
