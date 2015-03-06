@@ -83,14 +83,10 @@ print(cox2.phtest)
 
 ## @knitr 10.h
 melanoma2p8Split <- survSplit(melanoma, cut=c(2), end="trunk_yy", start="start", event="death_cancer")
-head(melanoma2p8Split)
-
-melanoma2p8Split <- mutate(melanoma2p8Split,
-                           fu = as.factor(start),
-                           risk_time = (trunk_yy-start))
+melanoma2p8Split <- mutate(melanoma2p8Split, fu = as.factor(start))
 
 ##Tabulate ageband including risk_time
-melanoma2p8Split %>% select(id, start, trunk_yy, risk_time) %>% filter(id<=3) %>% arrange(id, trunk_yy)
+melanoma2p8Split %>% select(id, start, trunk_yy) %>% filter(id<=3) %>% arrange(id, trunk_yy)
 
 head(melanoma2p8Split)
 

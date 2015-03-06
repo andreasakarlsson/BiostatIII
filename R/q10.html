@@ -196,41 +196,17 @@ print(cox2.phtest)</code></pre>
 <p>Are your conclusions from the test coherent with your conclusions from the graphical assessments?</p>
 <p><strong>(h)</strong> Estimate separate age effects for the first two years of follow-up (and separate estimates for the remainder of the follow-up) while controlling for sex and period. Do the estimates for the effect of age differ between the two periods of follow-up?</p>
 <pre class="r"><code>melanoma2p8Split &lt;- survSplit(melanoma, cut=c(2), end=&quot;trunk_yy&quot;, start=&quot;start&quot;, event=&quot;death_cancer&quot;)
-head(melanoma2p8Split)</code></pre>
-<pre><code>##      sex age     stage mmdx yydx surv_mm surv_yy       status
-## 1 Female  81 Localised   11 1981    26.5     2.5  Dead: other
-## 2 Female  75 Localised   10 1975    55.5     4.5  Dead: other
-## 3 Female  78 Localised    1 1978   177.5    14.5  Dead: other
-## 4 Female  75 Localised   12 1975    19.5     1.5 Dead: cancer
-## 5 Female  75 Localised   10 1975    65.5     5.5  Dead: other
-## 6 Female  80 Localised    8 1980    50.5     4.5  Dead: other
-##         subsite        year8594         dx       exit agegrp      bdate id
-## 1 Head and Neck Diagnosed 75-84 1981-11-07 1984-01-22    75+ 1900-11-07  1
-## 2 Head and Neck Diagnosed 75-84 1975-10-07 1980-05-22    75+ 1900-10-07  2
-## 3         Limbs Diagnosed 75-84 1978-01-07 1992-10-22    75+ 1900-01-07  3
-## 4         Trunk Diagnosed 75-84 1975-12-07 1977-07-22    75+ 1900-12-07  6
-## 5 Head and Neck Diagnosed 75-84 1975-10-07 1981-03-22    75+ 1900-10-07  7
-## 6 Head and Neck Diagnosed 75-84 1980-08-07 1984-10-22    75+ 1900-08-07  8
-##   death_cancer trunk_yy start
-## 1            0    2.000     0
-## 2            0    2.000     0
-## 3            0    2.000     0
-## 4            1    1.625     0
-## 5            0    2.000     0
-## 6            0    2.000     0</code></pre>
-<pre class="r"><code>melanoma2p8Split &lt;- mutate(melanoma2p8Split,
-                           fu = as.factor(start),
-                           risk_time = (trunk_yy-start))
+melanoma2p8Split &lt;- mutate(melanoma2p8Split, fu = as.factor(start))
 
 ##Tabulate ageband including risk_time
-melanoma2p8Split %&gt;% select(id, start, trunk_yy, risk_time) %&gt;% filter(id&lt;=3) %&gt;% arrange(id, trunk_yy)</code></pre>
-<pre><code>##   id start  trunk_yy risk_time
-## 1  1     0  2.000000 2.0000000
-## 2  1     2  2.208333 0.2083333
-## 3  2     0  2.000000 2.0000000
-## 4  2     2  4.625000 2.6250000
-## 5  3     0  2.000000 2.0000000
-## 6  3     2 10.000000 8.0000000</code></pre>
+melanoma2p8Split %&gt;% select(id, start, trunk_yy) %&gt;% filter(id&lt;=3) %&gt;% arrange(id, trunk_yy)</code></pre>
+<pre><code>##   id start  trunk_yy
+## 1  1     0  2.000000
+## 2  1     2  2.208333
+## 3  2     0  2.000000
+## 4  2     2  4.625000
+## 5  3     0  2.000000
+## 6  3     2 10.000000</code></pre>
 <pre class="r"><code>head(melanoma2p8Split)</code></pre>
 <pre><code>##      sex age     stage mmdx yydx surv_mm surv_yy       status
 ## 1 Female  81 Localised   11 1981    26.5     2.5  Dead: other
@@ -246,13 +222,13 @@ melanoma2p8Split %&gt;% select(id, start, trunk_yy, risk_time) %&gt;% filter(id&
 ## 4         Trunk Diagnosed 75-84 1975-12-07 1977-07-22    75+ 1900-12-07  6
 ## 5 Head and Neck Diagnosed 75-84 1975-10-07 1981-03-22    75+ 1900-10-07  7
 ## 6 Head and Neck Diagnosed 75-84 1980-08-07 1984-10-22    75+ 1900-08-07  8
-##   death_cancer trunk_yy start fu risk_time
-## 1            0    2.000     0  0     2.000
-## 2            0    2.000     0  0     2.000
-## 3            0    2.000     0  0     2.000
-## 4            1    1.625     0  0     1.625
-## 5            0    2.000     0  0     2.000
-## 6            0    2.000     0  0     2.000</code></pre>
+##   death_cancer trunk_yy start fu
+## 1            0    2.000     0  0
+## 2            0    2.000     0  0
+## 3            0    2.000     0  0
+## 4            1    1.625     0  0
+## 5            0    2.000     0  0
+## 6            0    2.000     0  0</code></pre>
 <pre class="r"><code>cox2p8Split1 &lt;- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594 + agegrp*fu, method=c(&quot;breslow&quot;), data=melanoma2p8Split)</code></pre>
 <pre><code>## Warning in coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594 + :
 ## X matrix deemed to be singular; variable 6</code></pre>
