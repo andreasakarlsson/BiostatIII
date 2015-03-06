@@ -82,6 +82,26 @@ plot(cox2.phtest[2],resid=TRUE, se=TRUE, main="Schoenfeld residuals", ylim=c(-4,
 print(cox2.phtest)
 
 ## @knitr 10.h
+melanoma2p8Split <- survSplit(melanoma, cut=c(2), end="trunk_yy", start="start", event="death_cancer")
+head(melanoma2p8Split)
+
+melanoma2p8Split <- mutate(melanoma2p8Split,
+                           fu = as.factor(start),
+                           risk_time = (trunk_yy-start))
+
+##Tabulate ageband including risk_time
+melanoma2p8Split %>% select(id, start, trunk_yy, risk_time) %>% filter(id<=3) %>% arrange(id, trunk_yy)
+
+head(melanoma2p8Split)
+
+cox2p8Split1 <- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594 + agegrp*fu, method=c("breslow"), data=melanoma2p8Split)
+summary(cox2p8Split1)
+
+## @knitr 10.i
+cox2p8Split2 <- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594  + fu*agegrp, method=c("breslow"), data=melanoma2p8Split)
+summary(cox2p8Split2)
+
+## @knitr 10.hother
 ## Ref: http://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf
 melanoma2p8 <- tmerge(melanoma, melanoma,  id=id, tstart=rep(0, nrow(melanoma)), tstop=trunk_yy,  death = event(death_cancer), after2 = tdc(rep(2, nrow(melanoma))))
 
@@ -91,7 +111,14 @@ head(melanoma2p8)
 cox2p8 <- coxph(Surv(tstart, tstop, death) ~ sex + year8594 + agegrp + agegrp:after2  + cluster(id), method=c("breslow"), data=melanoma2p8)
 summary(cox2p8)
 
-## @knitr 10.i
+## @knitr 10.iother
 ## This is not look correct!? Shocking!
 cox2p8_2<- coxph(Surv(tstart, tstop, death) ~  sex + year8594 + after2 + after2:agegrp + cluster(id), method=c("breslow"), data=melanoma2p8)
 summary(cox2p8_2)
+
+
+## cox2p8Split <- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594 + agegrp + agegrp:fu, method=c("breslow"), data=melanoma2p8Split)
+## ## I think stata is using another reference category
+## summary(cox2p8Split)
+
+
