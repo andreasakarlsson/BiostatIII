@@ -31,17 +31,17 @@ Load diet data and explore it.
 **(a)** For the localised melanoma data with 10 years follow-up, plot the instantaneous cause-specific hazard for each calendar period.
 
 
-```{r 10.a, warnings=FALSE}
+```{r 10.a, warnings=FALSE, message=FALSE}
 ```
 
 **(b)** Now plot the instantaneous cause-specific hazard for each calendar period using a log scale for the y axis (use the option yscale(log)). What would you expect to see if a proportional hazards assumption was appropriate? Do you see it?
 
-```{r 10.b, warnings=FALSE}
+```{r 10.b, warnings=FALSE, message=FALSE}
 ```
 
 **(c)** Another graphical way of checking the proportional hazards assumption is to plot the log cumulative cause specific hazard function for each calendar period. These plots were not given extensive coverage in the lectures, so attempt this if you like or continue to part (d).
 
-```{r 10.c, warnings=FALSE}
+```{r 10.c, warnings=FALSE, message=FALSE}
 ```
 
 **(d)** Compare your estimated hazard ratio from part (a) with the one from a fitted Cox model with calendar period as the only explanatory variable. Are they similar?

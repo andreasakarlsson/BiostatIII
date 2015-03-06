@@ -32,12 +32,12 @@ melanoma <- melanoma_raw %>%
     mutate(death_cancer = ifelse( status == "Dead: cancer" & surv_mm <= 120, 1, 0), #censuring for > 120 monts
            trunk_yy = ifelse(surv_mm <=  120, surv_mm/12, 10))  #scale to years and trunkate to 10 years 
 
-# Using muhaz to smooth the kaplan-meier hazards by strata the time and bandwidth options were selected based on smoother performance
+## @knitr 10.a
+# Using muhaz to smooth the kaplan-meier hazards by strata the time and bandwidth options were selected based on smoother performance. There must be better way of doing this. Sorry about the warnings.
 hazDiaDate <- melanoma %>%  group_by(year8594) %>%
     do( h = muhaz(times = .$trunk_yy, delta = .$death_cancer, min.time = min(.$trunk_yy[.$death_cancer==1]), max.time = max(.$trunk_yy[.$death_cancer==1]), bw.method="g", bw.grid=5)) %>%
     do( data.frame(Hazard = .$h$haz.est, Time = .$h$est.grid, Strata = .$year8594))
 
-## @knitr 10.a
 ## Max hazard ratio
 maxHaz <- hazDiaDate %>% group_by(Strata) %>%
     summarise(stratMax=max(Hazard))
@@ -55,25 +55,12 @@ ggplot(hazDiaDate, aes(x=Time, y=Hazard, colour= Strata)) +
 
 
 ## @knitr 10.c
-
+## Calculating cumulative hazard per strata
 hazDiaDate <- group_by(hazDiaDate, Strata) %>%
     mutate(cumHaz=cumsum(Hazard))
 
 ggplot(hazDiaDate, aes(log(Time), -log(cumHaz), color=Strata)) + geom_line() + geom_point()
 
-
-## mfit <- survfit(Surv(surv_yy, death_cancer) ~ year8594, data = melanoma)
-## plot(mfit, col=c("black", "red"), fun="cloglog")
-
-## plot(log(mfit$time), -log(-log(mfit$surv)), col=c("black", "red"))
-
-
-## hazard <- data.frame(with( melanoma, kphaz.fit(time=trunk_yy, status=death_cancer, strata=year8594)))
-
-## hazard <- group_by(hazard, strata) %>%
-##     mutate(cumHaz=cumsum(haz))
-
-## ggplot(hazard, aes(log(time), -log(cumHaz), color=factor(strata))) + geom_line()
 
 
 
