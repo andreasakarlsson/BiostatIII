@@ -63,392 +63,108 @@ img {
 
 <div id="biostat-iii-exercises-in-r" class="section level1">
 <h1>Biostat III exercises in R</h1>
-<div id="laboratory-exercise-9" class="section level2">
-<h2>Laboratory exercise 9</h2>
+<div id="laboratory-exercise-11" class="section level2">
+<h2>Laboratory exercise 11</h2>
 <div id="suggested-solutions-by" class="section level3">
 <h3>Suggested solutions by</h3>
-<p>Author: Annika Tillander, Johan Zetterqvist 2014-03-03,</p>
+<p>Author: Johan Zetterqvist, 2015-03-04</p>
 </div>
 </div>
-<div id="localised-melanoma-modelling-cause-specific-mortality-using-cox-regression" class="section level2">
-<h2>Localised melanoma: modelling cause-specific mortality using Cox regression</h2>
-<p>In exercise 7 we modelled the cause-specific mortality of patients diagnosed with localised melanoma using Poisson regression. We will now model cause-specific mortality using Cox regression and compare the results to those we obtained using the Poisson regression model.</p>
-<p>To fit a Cox proportional hazards model (for cause-specific survival) with calendar period as the only explanatory variable, the following commands can be used. Note that we are censoring all survival times at 120 months (10 years) in order to facilitate comparisons with the Poisson regression model in exercise 7.</p>
+<div id="cox-regression-with-all-cause-mortality-as-the-outcome" class="section level2">
+<h2>Cox regression with all-cause mortality as the outcome</h2>
 <hr />
+<p>Now fit a model to the localised melanoma data where the outcome is observed survival (i.e. all deaths are considered to be events).</p>
 <p>You may have to install the required packages the first time you use them. You can install a package by <code>install.packages(&quot;package_of_interest&quot;)</code> for each package you require.</p>
 <pre class="r"><code>require(survival)
 require(dplyr)
-require(readstata13)
+require(readstata13)</code></pre>
+<p>Load the melanoma data and explore it.</p>
+<pre class="r"><code>## Read melanoma data
+## and select subcohorts
+melanoma.l &lt;-
+  
+  tbl_df( read.dta13(&quot;http://biostat3.net/download/melanoma.dta&quot;) ) %&gt;%
+  
+  filter(stage==&quot;Localised&quot;) %&gt;%
+  
+  mutate(
+    ## Create a death indicator
+    death_cancer = as.numeric(status==&quot;Dead: cancer&quot;),
+    death_any = as.numeric(status==&quot;Dead: cancer&quot; | status==&quot;Dead: other&quot;) )
 
-###########################################
-### A help function to calculate ###
-### and print incidence (hazard) ratios
-### from a fitted poisson regression
-### from glm
-###########################################
-IRR &lt;- function(fit){
-    summfit &lt;- summary(fit )$coefficients
-    IRfit &lt;- exp( cbind( summfit[, 1:2], summfit[, 1] - 1.96*summfit[, 2], summfit[, 1] +
-                        1.96*summfit[, 2] ) )
-    colnames(IRfit) &lt;- c(&quot;IRR&quot;, &quot;Std. err&quot;, &quot;CI_lower&quot;, &quot;CI_upper&quot;)
-    print(IRfit)
-}</code></pre>
-<pre class="r"><code>## Read melanoma data, select subcohorts and create a death indicator
-melanoma.l &lt;- tbl_df( read.dta13(&quot;http://biostat3.net/download/melanoma.dta&quot;) ) %&gt;%
-    filter(stage==&quot;Localised&quot;) %&gt;%
-    mutate(death_cancer = as.numeric(status==&quot;Dead: cancer&quot;))
 
-melanoma.l2 &lt;-    mutate(melanoma.l,
-                         ## Create a death indicator (only count deaths within 120 months)
-                         death_cancer = death_cancer * as.numeric( surv_mm &lt;= 120),
-                         ## Create a new time variable
-                         surv_mm = pmin(surv_mm, 120))</code></pre>
-<p><strong>(a)</strong> Interpret the estimated hazard ratio, including a comment on statistical significance. Write the linear predictor using pen and paper. Draw a graph showing the shape of the fitted hazard rates for the two calendar periods, also indicating the distance between the curves (HINT: draw on the log hazard scale if you find it easier). Compare this to how you drew the graph in exercise 7h.</p>
-<pre class="r"><code>summary( coxfit9a &lt;- coxph(Surv(surv_mm, death_cancer) ~ year8594,
-                           data = melanoma.l2) )</code></pre>
+## Truncate follow-up time
+
+melanoma.l2 &lt;-
+  
+  mutate(melanoma.l,
+         ## Create new death indicators (only count deaths within 120 months)
+         death_cancer = death_cancer * as.numeric( surv_mm &lt;= 120),
+         death_any = death_any * as.numeric( surv_mm &lt;= 120),
+         ## Create a new time variable
+         surv_mm = pmin(surv_mm, 120))</code></pre>
+<p><strong>(a)</strong> Interpret the estimated hazard ratio for the parameter labelled 2.agegrp, including a comment on statistical significance.</p>
+<pre class="r"><code>summary( coxfit11a &lt;- coxph(Surv(surv_mm, death_any) ~ sex + year8594 + agegrp,
+                           data = melanoma.l2,
+                           ties = &quot;breslow&quot;) )</code></pre>
 <pre><code>## Call:
-## coxph(formula = Surv(surv_mm, death_cancer) ~ year8594, data = melanoma.l2)
+## coxph(formula = Surv(surv_mm, death_any) ~ sex + year8594 + agegrp, 
+##     data = melanoma.l2, ties = &quot;breslow&quot;)
+## 
+##   n= 5318, number of events= 1580 
+## 
+##                             coef exp(coef) se(coef)      z Pr(&gt;|z|)    
+## sexFemale               -0.49401   0.61017  0.05098 -9.690  &lt; 2e-16 ***
+## year8594Diagnosed 85-94 -0.28368   0.75301  0.05189 -5.467 4.59e-08 ***
+## agegrp45-59              0.40742   1.50294  0.08700  4.683 2.82e-06 ***
+## agegrp60-74              1.07766   2.93781  0.07991 13.486  &lt; 2e-16 ***
+## agegrp75+                2.13148   8.42736  0.08266 25.785  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+##                         exp(coef) exp(-coef) lower .95 upper .95
+## sexFemale                  0.6102     1.6389    0.5521    0.6743
+## year8594Diagnosed 85-94    0.7530     1.3280    0.6802    0.8336
+## agegrp45-59                1.5029     0.6654    1.2673    1.7823
+## agegrp60-74                2.9378     0.3404    2.5119    3.4359
+## agegrp75+                  8.4274     0.1187    7.1669    9.9096
+## 
+## Concordance= 0.709  (se = 0.008 )
+## Rsquare= 0.154   (max possible= 0.992 )
+## Likelihood ratio test= 890.4  on 5 df,   p=0
+## Wald test            = 937  on 5 df,   p=0
+## Score (logrank) test = 1121  on 5 df,   p=0</code></pre>
+<p><strong>(b)</strong> On comparing the estimates between the observed and cause-specific survival models it appears that only the parameters for age have changed substantially. Can you explain why the estimates for the effect of age would be expected to change more than the estimates of the effect of sex and period?</p>
+<pre class="r"><code>summary( coxfit11b &lt;- coxph(Surv(surv_mm, death_cancer) ~ sex + year8594 + agegrp,
+                           data = melanoma.l2,
+                           ties = &quot;breslow&quot;) )</code></pre>
+<pre><code>## Call:
+## coxph(formula = Surv(surv_mm, death_cancer) ~ sex + year8594 + 
+##     agegrp, data = melanoma.l2, ties = &quot;breslow&quot;)
 ## 
 ##   n= 5318, number of events= 960 
 ## 
 ##                             coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-## year8594Diagnosed 85-94 -0.25297   0.77649  0.06579 -3.845 0.000121 ***
+## sexFemale               -0.52964   0.58881  0.06545 -8.092 5.55e-16 ***
+## year8594Diagnosed 85-94 -0.33284   0.71688  0.06618 -5.029 4.93e-07 ***
+## agegrp45-59              0.28247   1.32640  0.09417  2.999   0.0027 ** 
+## agegrp60-74              0.61914   1.85732  0.09088  6.813 9.56e-12 ***
+## agegrp75+                1.21570   3.37265  0.10444 11.641  &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ##                         exp(coef) exp(-coef) lower .95 upper .95
-## year8594Diagnosed 85-94    0.7765      1.288    0.6825    0.8834
-## 
-## Concordance= 0.533  (se = 0.008 )
-## Rsquare= 0.003   (max possible= 0.949 )
-## Likelihood ratio test= 14.83  on 1 df,   p=0.0001177
-## Wald test            = 14.78  on 1 df,   p=0.0001206
-## Score (logrank) test = 14.86  on 1 df,   p=0.000116</code></pre>
-<p><strong>(b)</strong> (This part is more theoretical and is not required in order to understand the remaining parts.)</p>
-<p>R reports a Wald test of the null hypothesis that survival is independent of calendar period. The test statistic (and associated P-value), is reported in the table of parameter estimates. Under the null hypothesis, the test statistic has a standard normal (Z) distribution, so the square of the test statistic will have a chi square distribution with one degree of freedom.</p>
-<p>R also reports a likelihood ratio test statistic of the null hypothesis that none of the parameters in the model are associated with survival. In general, this test statistic will have a chi-square distribution with degrees of freedom equal to the number of parameters in the model. For the current model, with only one parameter, the test statistic has a chi square distribution with one degree of freedom.</p>
-<p>Compare these two test statistics with each other and with the log rank test statistic (which also has a chi square distribution) calculated in question 3c (you should, however, recalculate the log rank test since we have restricted follow-up to the first 10 years in this exercise). Would you expect these test statistics to be similar? Consider the null and alternative hypotheses of each test and the assumptions involved with each test.</p>
-<pre class="r"><code>summary( coxfit3c &lt;- coxph(Surv(surv_mm, death_cancer) ~ year8594,
-                           data = melanoma.l) )</code></pre>
-<pre><code>## Call:
-## coxph(formula = Surv(surv_mm, death_cancer) ~ year8594, data = melanoma.l)
-## 
-##   n= 5318, number of events= 1013 
-## 
-##                             coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-## year8594Diagnosed 85-94 -0.25790   0.77267  0.06565 -3.928 8.56e-05 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-##                         exp(coef) exp(-coef) lower .95 upper .95
-## year8594Diagnosed 85-94    0.7727      1.294    0.6794    0.8788
-## 
-## Concordance= 0.533  (se = 0.008 )
-## Rsquare= 0.003   (max possible= 0.955 )
-## Likelihood ratio test= 15.49  on 1 df,   p=8.309e-05
-## Wald test            = 15.43  on 1 df,   p=8.56e-05
-## Score (logrank) test = 15.51  on 1 df,   p=8.214e-05</code></pre>
-<p><strong>(c)</strong> Now include sex and age (in categories) in the model. Write the linear predictor using pen and paper.</p>
-<ol style="list-style-type: lower-roman">
-<li>Interpret the estimated hazard ratio for the parameter labelled agegrp 2, including a comment on statistical significance.</li>
-<li>Is the effect of calendar period strongly confounded by age and sex? That is, does the inclusion of sex and age in the model change the estimate for the effect of calendar period?</li>
-<li>Perform a Wald test of the overall effect of age and interpret the results.</li>
-</ol>
-<pre class="r"><code>summary( coxfit9c &lt;- coxph(Surv(surv_mm, death_cancer) ~ year8594 + sex + agegrp,
-                           data = melanoma.l2) )</code></pre>
-<pre><code>## Call:
-## coxph(formula = Surv(surv_mm, death_cancer) ~ year8594 + sex + 
-##     agegrp, data = melanoma.l2)
-## 
-##   n= 5318, number of events= 960 
-## 
-##                             coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-## year8594Diagnosed 85-94 -0.33339   0.71649  0.06618 -5.037 4.72e-07 ***
-## sexFemale               -0.53061   0.58825  0.06545 -8.107 5.55e-16 ***
-## agegrp45-59              0.28283   1.32688  0.09417  3.003  0.00267 ** 
-## agegrp60-74              0.62006   1.85904  0.09088  6.823 8.90e-12 ***
-## agegrp75+                1.21801   3.38045  0.10443 11.663  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-##                         exp(coef) exp(-coef) lower .95 upper .95
-## year8594Diagnosed 85-94    0.7165     1.3957    0.6293    0.8157
-## sexFemale                  0.5882     1.7000    0.5174    0.6688
-## agegrp45-59                1.3269     0.7536    1.1032    1.5959
-## agegrp60-74                1.8590     0.5379    1.5557    2.2215
-## agegrp75+                  3.3804     0.2958    2.7547    4.1483
+## sexFemale                  0.5888     1.6983    0.5179    0.6694
+## year8594Diagnosed 85-94    0.7169     1.3949    0.6297    0.8162
+## agegrp45-59                1.3264     0.7539    1.1028    1.5953
+## agegrp60-74                1.8573     0.5384    1.5543    2.2194
+## agegrp75+                  3.3727     0.2965    2.7484    4.1387
 ## 
 ## Concordance= 0.646  (se = 0.01 )
 ## Rsquare= 0.039   (max possible= 0.949 )
-## Likelihood ratio test= 212.7  on 5 df,   p=0
-## Wald test            = 217.9  on 5 df,   p=0
-## Score (logrank) test = 226.8  on 5 df,   p=0</code></pre>
-<pre class="r"><code>## Test if the effect of age is significant
-## Use a Wald test with the car package
-require(car)</code></pre>
-<pre><code>## Loading required package: car</code></pre>
-<pre><code>## Warning: no function found corresponding to methods exports from 'SparseM'
-## for: 'coerce'</code></pre>
-<pre class="r"><code>linearHypothesis(coxfit9c,c(&quot;agegrp45-59 = 0&quot;,&quot;agegrp60-74 = 0&quot;,&quot;agegrp75+ = 0&quot;))</code></pre>
-<pre><code>## Linear hypothesis test
-## 
-## Hypothesis:
-## agegrp45 - 59 = 0
-## agegrp60 - 74 = 0
-## agegrp75  +  = 0
-## 
-## Model 1: restricted model
-## Model 2: Surv(surv_mm, death_cancer) ~ year8594 + sex + agegrp
-## 
-##   Res.Df Df  Chisq Pr(&gt;Chisq)    
-## 1   5316                         
-## 2   5313  3 154.38  &lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<p><strong>(d)</strong> Perform a likelihood ratio test of the overall effect of age and interpret the results.</p>
-<pre class="r"><code>## Test if the effect of age is significant
-## Use an LR test with the anova function
-## The model without agegrp
-summary( coxfit9d &lt;- coxph(Surv(surv_mm, death_cancer) ~ year8594 + sex,
-                           data = melanoma.l2) )</code></pre>
-<pre><code>## Call:
-## coxph(formula = Surv(surv_mm, death_cancer) ~ year8594 + sex, 
-##     data = melanoma.l2)
-## 
-##   n= 5318, number of events= 960 
-## 
-##                             coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-## year8594Diagnosed 85-94 -0.27976   0.75596  0.06588 -4.246 2.17e-05 ***
-## sexFemale               -0.47825   0.61987  0.06494 -7.364 1.78e-13 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-##                         exp(coef) exp(-coef) lower .95 upper .95
-## year8594Diagnosed 85-94    0.7560      1.323    0.6644    0.8602
-## sexFemale                  0.6199      1.613    0.5458    0.7040
-## 
-## Concordance= 0.578  (se = 0.009 )
-## Rsquare= 0.013   (max possible= 0.949 )
-## Likelihood ratio test= 69.32  on 2 df,   p=8.882e-16
-## Wald test            = 69.03  on 2 df,   p=9.992e-16
-## Score (logrank) test = 70.02  on 2 df,   p=6.661e-16</code></pre>
-<pre class="r"><code>## LR test
-anova(coxfit9c, coxfit9d)</code></pre>
-<pre><code>## Analysis of Deviance Table
-##  Cox model: response is  Surv(surv_mm, death_cancer)
-##  Model 1: ~ year8594 + sex + agegrp
-##  Model 2: ~ year8594 + sex
-##    loglik  Chisq Df P(&gt;|Chi|)    
-## 1 -7792.7                        
-## 2 -7864.4 143.37  3 &lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<p>Compare your findings to those obtained using the Wald test. Are the findings similar? Would you expect them to be similar?</p>
-<p><strong>(e)</strong> The model estimated in question 9c is similar to the model estimated in question 7i. i. Both models adjust for sex, year8594, and i.agegrp but the Poisson regression model in question 7i appears to adjust for an additional variable (i.fu). Is the Poisson regression model adjusting for an additional factor? Explain. ii. Would you expect the parameter estimate for sex, period, and age to be similar for the two models? Are they similar? iii. Do both models assume proportional hazards? Explain.</p>
-<pre class="r"><code>summary( coxfit9e &lt;- coxph(Surv(surv_mm, death_cancer) ~ year8594 + sex + agegrp,
-                           data = melanoma.l2) )</code></pre>
-<pre><code>## Call:
-## coxph(formula = Surv(surv_mm, death_cancer) ~ year8594 + sex + 
-##     agegrp, data = melanoma.l2)
-## 
-##   n= 5318, number of events= 960 
-## 
-##                             coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-## year8594Diagnosed 85-94 -0.33339   0.71649  0.06618 -5.037 4.72e-07 ***
-## sexFemale               -0.53061   0.58825  0.06545 -8.107 5.55e-16 ***
-## agegrp45-59              0.28283   1.32688  0.09417  3.003  0.00267 ** 
-## agegrp60-74              0.62006   1.85904  0.09088  6.823 8.90e-12 ***
-## agegrp75+                1.21801   3.38045  0.10443 11.663  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-##                         exp(coef) exp(-coef) lower .95 upper .95
-## year8594Diagnosed 85-94    0.7165     1.3957    0.6293    0.8157
-## sexFemale                  0.5882     1.7000    0.5174    0.6688
-## agegrp45-59                1.3269     0.7536    1.1032    1.5959
-## agegrp60-74                1.8590     0.5379    1.5557    2.2215
-## agegrp75+                  3.3804     0.2958    2.7547    4.1483
-## 
-## Concordance= 0.646  (se = 0.01 )
-## Rsquare= 0.039   (max possible= 0.949 )
-## Likelihood ratio test= 212.7  on 5 df,   p=0
-## Wald test            = 217.9  on 5 df,   p=0
-## Score (logrank) test = 226.8  on 5 df,   p=0</code></pre>
-<pre class="r"><code>## Split follow up by year
-melanoma.spl &lt;- survSplit(melanoma.l2, cut=12*(0:10), end=&quot;surv_mm&quot;, start=&quot;start&quot;,
-                           event=&quot;death_cancer&quot;)
-
-## Calculate persontime and
-## recode start time as a factor
-melanoma.spl &lt;- mutate(melanoma.spl,
-                       pt = surv_mm - start,
-                       fu = as.factor(start) )
-
-## Run Poisson regression
-summary(poisson9e &lt;- glm( death_cancer ~ fu + year8594 + sex + agegrp + offset( log(pt) ),
-                         family = poisson,
-                         data = melanoma.spl ))</code></pre>
-<pre><code>## 
-## Call:
-## glm(formula = death_cancer ~ fu + year8594 + sex + agegrp + offset(log(pt)), 
-##     family = poisson, data = melanoma.spl)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -0.5646  -0.2672  -0.2098  -0.1597   3.6806  
-## 
-## Coefficients:
-##                         Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)             -6.85172    0.14322 -47.841  &lt; 2e-16 ***
-## fu12                     1.26827    0.13592   9.331  &lt; 2e-16 ***
-## fu24                     1.30657    0.13806   9.464  &lt; 2e-16 ***
-## fu36                     1.07575    0.14627   7.354 1.92e-13 ***
-## fu48                     0.89517    0.15559   5.753 8.75e-09 ***
-## fu60                     0.81370    0.16368   4.971 6.65e-07 ***
-## fu72                     0.58637    0.17957   3.265  0.00109 ** 
-## fu84                     0.25361    0.20758   1.222  0.22181    
-## fu96                     0.36427    0.21006   1.734  0.08290 .  
-## fu108                   -0.22796    0.27844  -0.819  0.41296    
-## year8594Diagnosed 85-94 -0.32516    0.06618  -4.913 8.97e-07 ***
-## sexFemale               -0.53180    0.06545  -8.125 4.48e-16 ***
-## agegrp45-59              0.28352    0.09417   3.011  0.00261 ** 
-## agegrp60-74              0.62185    0.09088   6.843 7.76e-12 ***
-## agegrp75+                1.22386    0.10444  11.718  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for poisson family taken to be 1)
-## 
-##     Null deviance: 8651.5  on 34308  degrees of freedom
-## Residual deviance: 8233.4  on 34294  degrees of freedom
-## AIC: 10183
-## 
-## Number of Fisher Scoring iterations: 7</code></pre>
-<pre class="r"><code>IRR(poisson9e)</code></pre>
-<pre><code>##                                IRR Std. err     CI_lower    CI_upper
-## (Intercept)             0.00105764 1.153983 0.0007987803 0.001400388
-## fu12                    3.55468470 1.145595 2.7233275914 4.639832303
-## fu24                    3.69349752 1.148044 2.8178562384 4.841241994
-## fu36                    2.93219656 1.157511 2.2013249615 3.905728054
-## fu48                    2.44775331 1.168350 1.8043663452 3.320554200
-## fu60                    2.25623262 1.177841 1.6370207666 3.109664676
-## fu72                    1.79745329 1.196705 1.2641618301 2.555715785
-## fu84                    1.28866663 1.230698 0.8579131415 1.935699096
-## fu96                    1.43945962 1.233755 0.9536537473 2.172742462
-## fu108                   0.79615726 1.321071 0.4613002902 1.374086228
-## year8594Diagnosed 85-94 0.72241051 1.068424 0.6345217537 0.822472908
-## sexFemale               0.58754651 1.067642 0.5168063595 0.667969533
-## agegrp45-59             1.32779475 1.098749 1.1040011434 1.596953870
-## agegrp60-74             1.86237635 1.095132 1.5585217011 2.225471516
-## agegrp75+               3.40028687 1.110094 2.7708359482 4.172730189</code></pre>
-<pre class="r"><code>summary(coxfit9e)</code></pre>
-<pre><code>## Call:
-## coxph(formula = Surv(surv_mm, death_cancer) ~ year8594 + sex + 
-##     agegrp, data = melanoma.l2)
-## 
-##   n= 5318, number of events= 960 
-## 
-##                             coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-## year8594Diagnosed 85-94 -0.33339   0.71649  0.06618 -5.037 4.72e-07 ***
-## sexFemale               -0.53061   0.58825  0.06545 -8.107 5.55e-16 ***
-## agegrp45-59              0.28283   1.32688  0.09417  3.003  0.00267 ** 
-## agegrp60-74              0.62006   1.85904  0.09088  6.823 8.90e-12 ***
-## agegrp75+                1.21801   3.38045  0.10443 11.663  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-##                         exp(coef) exp(-coef) lower .95 upper .95
-## year8594Diagnosed 85-94    0.7165     1.3957    0.6293    0.8157
-## sexFemale                  0.5882     1.7000    0.5174    0.6688
-## agegrp45-59                1.3269     0.7536    1.1032    1.5959
-## agegrp60-74                1.8590     0.5379    1.5557    2.2215
-## agegrp75+                  3.3804     0.2958    2.7547    4.1483
-## 
-## Concordance= 0.646  (se = 0.01 )
-## Rsquare= 0.039   (max possible= 0.949 )
-## Likelihood ratio test= 212.7  on 5 df,   p=0
-## Wald test            = 217.9  on 5 df,   p=0
-## Score (logrank) test = 226.8  on 5 df,   p=0</code></pre>
-<p><strong>(f)</strong> ADVANCED: By splitting at each failure time we can estimate a Poisson regression model that is identical to the Cox model.</p>
-<pre class="r"><code>sfit9f &lt;- survfit(Surv(surv_mm, event=death_cancer) ~ 1,
-                  data = melanoma.l2 )
-## Have a look at the fitted object
-str(sfit9f, 1)</code></pre>
-<pre><code>## List of 13
-##  $ n        : int 5318
-##  $ time     : num [1:121] 0.5 1.5 2.5 3.5 4.5 5.5 6.5 7.5 8.5 9.5 ...
-##  $ n.risk   : num [1:121] 5318 5315 5304 5298 5292 ...
-##  $ n.event  : num [1:121] 0 5 1 4 4 7 5 8 7 11 ...
-##  $ n.censor : num [1:121] 3 6 5 2 11 9 6 7 9 6 ...
-##  $ surv     : num [1:121] 1 0.999 0.999 0.998 0.997 ...
-##  $ type     : chr &quot;right&quot;
-##  $ std.err  : num [1:121] 0 0.000421 0.000461 0.000596 0.000706 ...
-##  $ upper    : num [1:121] 1 1 1 0.999 0.999 ...
-##  $ lower    : num [1:121] 1 0.998 0.998 0.997 0.996 ...
-##  $ conf.type: chr &quot;log&quot;
-##  $ conf.int : num 0.95
-##  $ call     : language survfit(formula = Surv(surv_mm, event = death_cancer) ~ 1, data = melanoma.l2)
-##  - attr(*, &quot;class&quot;)= chr &quot;survfit&quot;</code></pre>
-<pre class="r"><code>head(sfit9f$time)</code></pre>
-<pre><code>## [1] 0.5 1.5 2.5 3.5 4.5 5.5</code></pre>
-<pre class="r"><code>## Split follow up by year
-melanoma.spl2 &lt;- survSplit(melanoma.l2, cut=sfit9f$time, end=&quot;surv_mm&quot;, start=&quot;start&quot;,
-                           event=&quot;death_cancer&quot;)
-
-## Calculate persontime and
-## recode start time as a factor
-melanoma.spl2 &lt;- mutate(melanoma.spl2,
-                        pt = surv_mm - start,
-                        fu = as.factor(start) )
-
-## Run Poisson regression
-poisson9f &lt;- glm( death_cancer ~ fu + year8594 + sex + agegrp + offset( log(pt) ),
-                         family = poisson,
-                         data = melanoma.spl2 )
-
-## IRR
-coef9f &lt;- summary(poisson9f)$coefficients
-## We are not interested in nuisance parameters fu1, fu2, etc
-npar &lt;- dim(coef9f)[1]
-pars &lt;- (npar-4):npar
-IRfit9f &lt;- exp( cbind( coef9f[pars, 1:2], coef9f[pars, 1] - 1.96*coef9f[pars, 2], coef9f[pars, 1] +
-                        1.96*coef9f[pars, 2] ) )
-colnames(IRfit9f) &lt;- c(&quot;IRR&quot;, &quot;Std. err&quot;, &quot;CI_lower&quot;, &quot;CI_upper&quot;)
-IRfit9f</code></pre>
-<pre><code>##                               IRR Std. err  CI_lower  CI_upper
-## year8594Diagnosed 85-94 0.7168836 1.068421 0.6296708 0.8161759
-## sexFemale               0.5888144 1.067639 0.5179244 0.6694075
-## agegrp45-59             1.3263971 1.098750 1.1028376 1.5952751
-## agegrp60-74             1.8573227 1.095134 1.5542895 2.2194370
-## agegrp75+               3.3726522 1.110084 2.7483607 4.1387519</code></pre>
-<pre class="r"><code>summary(coxfit9e)</code></pre>
-<pre><code>## Call:
-## coxph(formula = Surv(surv_mm, death_cancer) ~ year8594 + sex + 
-##     agegrp, data = melanoma.l2)
-## 
-##   n= 5318, number of events= 960 
-## 
-##                             coef exp(coef) se(coef)      z Pr(&gt;|z|)    
-## year8594Diagnosed 85-94 -0.33339   0.71649  0.06618 -5.037 4.72e-07 ***
-## sexFemale               -0.53061   0.58825  0.06545 -8.107 5.55e-16 ***
-## agegrp45-59              0.28283   1.32688  0.09417  3.003  0.00267 ** 
-## agegrp60-74              0.62006   1.85904  0.09088  6.823 8.90e-12 ***
-## agegrp75+                1.21801   3.38045  0.10443 11.663  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-##                         exp(coef) exp(-coef) lower .95 upper .95
-## year8594Diagnosed 85-94    0.7165     1.3957    0.6293    0.8157
-## sexFemale                  0.5882     1.7000    0.5174    0.6688
-## agegrp45-59                1.3269     0.7536    1.1032    1.5959
-## agegrp60-74                1.8590     0.5379    1.5557    2.2215
-## agegrp75+                  3.3804     0.2958    2.7547    4.1483
-## 
-## Concordance= 0.646  (se = 0.01 )
-## Rsquare= 0.039   (max possible= 0.949 )
-## Likelihood ratio test= 212.7  on 5 df,   p=0
-## Wald test            = 217.9  on 5 df,   p=0
-## Score (logrank) test = 226.8  on 5 df,   p=0</code></pre>
+## Likelihood ratio test= 211.9  on 5 df,   p=0
+## Wald test            = 217.1  on 5 df,   p=0
+## Score (logrank) test = 225.9  on 5 df,   p=0</code></pre>
 </div>
 </div>
 
