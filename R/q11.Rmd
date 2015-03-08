@@ -31,10 +31,10 @@ Load the melanoma data and explore it.
 **(a)** Interpret the estimated hazard ratio for the parameter labelled 2.agegrp, including a comment on statistical significance.
 
 
-```{r 11.a, warnings=FALSE}
+```{r 11.a, warning=FALSE}
 ```
 
 **(b)** On comparing the estimates between the observed and cause-specific survival models it appears that only the parameters for age have changed substantially. Can you explain why the estimates for the effect of age would be expected to change more than the estimates of the effect of sex and period?
 
-```{r 11.b, warnings=FALSE}
+```{r 11.b, warning=FALSE}
 ```

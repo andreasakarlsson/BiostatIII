@@ -35,10 +35,10 @@ ii. Is it correct to say that both of these models estimate the effect of high e
 iii. Would you expect the parameter estimates for these two models to be very different? Is there a large difference?
 
 
-```{r 13.a, warnings=FALSE, message=FALSE}
+```{r 13.a, warning=FALSE, message=FALSE}
 ```
 
 **(b)** Use the attained age as the timescale and refit the Cox model. Is the estimate of the effect of high energy different? Would we expect it to be different?
 
-```{r 13.b, warnings=FALSE, message=FALSE}
+```{r 13.b, warning=FALSE, message=FALSE}
 ```

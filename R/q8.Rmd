@@ -43,12 +43,12 @@ Rates can be modelled on different timescales, e.g., attained age, time-since-en
 
 Plot the CHD incidence rates by attained age.
 
-```{r 8a1_Haz_att_age,  message=FALSE, warnings = FALSE, echo=FALSE}
+```{r 8a1_Haz_att_age,  message=FALSE, warning = FALSE, echo=FALSE}
 ```
 
 **(a2)** Plot the CHD incidence rates by time-since-entry. Do the same for CHD hazard by different energy intakes (hieng).
 
-```{r 8a2_Haz_time_entry,  message=FALSE, warnings = FALSE}
+```{r 8a2_Haz_time_entry,  message=FALSE, warning = FALSE}
 ```
 
 **(b)** Fit a poisson model to find the incidence rate ratio for the high energy group compared to the low energy group without adjusting for any time scale.

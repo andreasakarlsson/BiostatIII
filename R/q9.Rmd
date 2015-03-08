@@ -61,7 +61,7 @@ iii. Perform a Wald test of the overall effect of age and interpret the results.
 **(d)** Perform a likelihood ratio test of the overall effect of age and interpret the results.
 
 
-```{r 9.d, warnings=FALSE}
+```{r 9.d, warning=FALSE}
 ```
 
 Compare your findings to those obtained using the Wald test. Are the findings similar? Would you expect them to be similar?

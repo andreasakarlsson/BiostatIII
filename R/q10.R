@@ -21,14 +21,14 @@ require(ggplot2)
 
 
 ## @knitr loadPreprocess
-melanoma_raw<- read.dta13("http://biostat3.net/download/melanoma.dta")
+melanoma_raw <- read.dta13("http://biostat3.net/download/melanoma.dta")
 melanoma <- melanoma_raw %>%
     filter(stage == "Localised") %>%
     mutate(death_cancer = ifelse( status == "Dead: cancer" & surv_mm <= 120, 1, 0), #censuring for > 120 monts
            trunk_yy = ifelse(surv_mm <=  120, surv_mm/12, 10))  #scale to years and trunkate to 10 years 
 
 ## @knitr 10.a
-# Using muhaz to smooth the kaplan-meier hazards by strata the time and bandwidth options were selected based on smoother performance. There must be better way of doing this. Sorry about the warnings.
+# Using muhaz to smooth the kaplan-meier hazards by strata the time and bandwidth options were selected based on smoother performance.
 hazDiaDate <- melanoma %>%  group_by(year8594) %>%
     do( h = muhaz(times = .$trunk_yy, delta = .$death_cancer, min.time = min(.$trunk_yy[.$death_cancer==1]), max.time = max(.$trunk_yy[.$death_cancer==1]), bw.method="g", bw.grid=5)) %>%
     do( data.frame(Hazard = .$h$haz.est, Time = .$h$est.grid, Strata = .$year8594))
@@ -98,25 +98,8 @@ summary(cox2p8Split1)
 cox2p8Split2 <- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594 + fu + fu:agegrp, method=c("breslow"), data=melanoma2p8Split)
 summary(cox2p8Split2)
 
+## Alternative approach that I did not get to work at:
+## http://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf
 
-## @knitr 10.hother
-## Ref: http://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf
-melanoma2p8 <- tmerge(melanoma, melanoma,  id=id, tstart=rep(0, nrow(melanoma)), tstop=trunk_yy,  death = event(death_cancer), after2 = tdc(rep(2, nrow(melanoma))))
-
-head(melanoma2p8)
-
-## This is not look correct!? Shocking!
-cox2p8 <- coxph(Surv(tstart, tstop, death) ~ sex + year8594 + agegrp + agegrp:after2  + cluster(id), method=c("breslow"), data=melanoma2p8)
-summary(cox2p8)
-
-## @knitr 10.iother
-## This is not look correct!? Shocking!
-cox2p8_2<- coxph(Surv(tstart, tstop, death) ~  sex + year8594 + after2 + after2:agegrp + cluster(id), method=c("breslow"), data=melanoma2p8)
-summary(cox2p8_2)
-
-
-## cox2p8Split <- coxph(Surv(start, trunk_yy, death_cancer) ~ sex + year8594 + agegrp + agegrp:fu, method=c("breslow"), data=melanoma2p8Split)
-## ## I think stata is using another reference category
-## summary(cox2p8Split)
 
 

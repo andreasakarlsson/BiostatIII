@@ -31,7 +31,6 @@ IRR <- function(fit){
                         1.96*summfit[, 2] ) )
     colnames(IRfit) <- c("IRR", "Std. err", "CI_lower", "CI_upper")
     print(IRfit)
-
 }
 
 
