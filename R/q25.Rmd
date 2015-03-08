@@ -4,7 +4,7 @@ Laboratory exercise 25
 -----------
 
 ### Suggested solutions by
-Author: Benedicte delcoigne, 2015-03-06
+Author: Bénédicte Delcoigne, 2015-03-06
 
 ## Localised melanoma : generating and analysing a nested case-control (NCC) study
 
