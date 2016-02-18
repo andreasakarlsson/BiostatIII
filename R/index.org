@@ -1,25 +1,24 @@
 #+OPTIONS: toc:nil num:nil
 
 * Overview
-R-solutions for the [[http://biostat3.net/][biostat III]] course on survival analysis at the
+R-solutions for the [[http://biostat3.net/][Biostat III]] course on survival analysis at the
 [[http://ki.se/en/meb/startpage][Department of Medical Epidemiology and Biostatistics]] at the Karolinska
-Institute. The solutions correspond to those in this [[http://biostat3.net/download/labs_biostat3_2015.pdf][lab description]].
+Institute. The solutions correspond to the questions in this [[http://biostat3.net/download/labs_biostat3_2015.pdf][lab description]].
 
 * Questions
-+ http://andreasakarlsson.github.io/BiostatIII/R/q1.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q2.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q3.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q4.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q6.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q7.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q8.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q9.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q10.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q11.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q12.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q13.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q22.html
-+ http://andreasakarlsson.github.io/BiostatIII/R/q25.html
-
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q1.html][Question #1]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q2.html][Question #2]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q3.html][Question #3]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q4.html][Question #4]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q6.html][Question #6]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q7.html][Question #7]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q8.html][Question #8]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q9.html][Question #9]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q10.html][Question #q10]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q11.html][Question #q11]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q12.html][Question #q12]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q13.html][Question #q13]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q22.html][Question #q22]]
++ [[http://andreasakarlsson.github.io/BiostatIII/R/q25.html][Question #q25]]
 ** Authors
 [[http://ki.se/en/people/anntil][Annika Tillander]], [[http://ki.se/en/people/johzet][Johan Zetterqvist]], [[http://ki.se/en/people/bendel][Bénédicte Delcoigne]] and [[http://ki.se/en/people/andkar][Andreas Karlsson]]
