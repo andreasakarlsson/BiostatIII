@@ -3,7 +3,7 @@
 * Overview
 R-solutions for the [[http://biostat3.net/][Biostat III]] course on survival analysis at the
 [[http://ki.se/en/meb/startpage][Department of Medical Epidemiology and Biostatistics]] at the Karolinska
-Institute. The solutions correspond to the questions in this [[http://biostat3.net/download/labs_biostat3_2015.pdf][lab description]].
+Institute. The solutions correspond to the questions in this [[http://biostat3.net/download/labs_biostat3_2016.pdf][lab description]].
 
 * Questions
 + [[http://andreasakarlsson.github.io/BiostatIII/R/q1.html][Question #1]]
