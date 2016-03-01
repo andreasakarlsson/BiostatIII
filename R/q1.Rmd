@@ -4,39 +4,45 @@ Laboratory exercise 1b
 -----------
 
 ### Suggested solutions by
-Author: Annika Tillander, 2014-01-30  
-Edited: Andreas Karlsson, 2015-02-27
+Author: Annika Tillander, 2014-01-30 <br/>
+Edited: Andreas Karlsson, 2015-02-27, 2016-03-01
 
 -----------
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q1.R')
 opts_chunk$set(cache=FALSE, fig.width=7, fig.height=6)
 ```
 
-You may have to install the required packages the first time you use them. You can install a package by `install.packages("package_of_interest")` for each package you require.
+You may have to install the required packages the first time you use
+them. You can install a package by
+`install.packages("package_of_interest")` for each package you
+require.
 
 ```{r loadDependecies, message=FALSE}
 ```
 
 Number of events and number lost summarised by year.
 
-```{r eventsPerMonth}
+```{r eventsPerYear}
 ```
 
-Following are the life table estimates. Note that in the lectures, when we estimated all-cause survival, there were 8 deaths in the first interval. One of these died of a cause other than cancer so in the cause-specific survival analysis we see that there are 7 ‘deaths’ and 1 censoring (lifetab uses the term ‘nlost’ for number lost to follow-up) in the first interval.
+Following are the life table estimates. Note that in the lectures,
+when we estimated all-cause survival, there were 8 deaths in the first
+interval. One of these died of a cause other than cancer so in the
+cause-specific survival analysis we see that there are 7 ‘deaths’ and
+1 censoring (in lifetab we used the term ‘nlost’ for number lost to
+follow-up) in the first interval.
 
 ```{r lifeTable}
 ```
 
-Following is a table of Kaplan-Meier estimates. It is not clear from the table, if the person censored at time 2 was at risk when the other person dies at time 2. Following the table is a graph of the survival function.
+Following is a table of Kaplan-Meier estimates. It is not clear from
+the table, if the person censored at time 2 was at risk when the other
+person dies at time 2. Following the table is a graph of the survival
+function.
 
 
 ```{r KaplanMeier, message=FALSE}
-```
-
-You can also create Kaplan-Meier esimates stratified by sex with a number at risk table below.
-
-```{r KaplanMeierNumberAtRisk, message=FALSE, fig.width=7, fig.height=7}
 ```
