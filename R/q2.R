@@ -1,53 +1,60 @@
 # Purpose: To do the solution for Biostat III exercises in R
 # Author: Annika Tillander, 2014-01-30
-# Edited: Andreas Karlsson, 2015-02-24 
+# Edited: Andreas Karlsson, 2015-02-24, 2016-03-07
 ###############################################################################
-
-## Install needed packages only need to be done once
-## install.packages("survival")
-## install.packages("KMsurv")
-## install.packages("readstata13")
-## install.packages("dplyr")
-## install.packages("ggplot2")
-## install.packages("Gally")
-## install.packages("muhaz")
-## install.packages("gridExtra")
-## install.packages("RCurl")
 
 ###############################################################################
 ## Exercise 2
 ###############################################################################
 ## @knitr loadDependecies
-require(readstata13) #Needed to read data set from Stata 13
+require(foreign)  # needed to read data set from Stata
 require(survival) #for Surv and survfit
-require(muhaz) #for hazard estimates
-require(dplyr)
-require(ggplot2)
-require(GGally)
-require(gridExtra)
-require(RCurl)
-helperFunctions <- eval(expr=parse(text=getURL("https://raw.githubusercontent.com/andreasakarlsson/BiostatIII/master/R/helpFuncBioIII.R", .opts = list(ssl.verifypeer = FALSE))))
+require(muhaz)    #for hazard estimates
+require(dplyr)    # for data manipulation
 
 ## @knitr loadPreprocess
-melanoma_raw <- read.dta13("http://biostat3.net/download/melanoma.dta")
-head(melanoma_raw[c("age", "sex", "stage", "status", "surv_mm", "surv_yy")])
-melanoma <- mutate(melanoma_raw,
-                   death_cancer = ifelse( status == "Dead: cancer", 1, 0),
-                   death_all = ifelse( status == "Dead: cancer" | status == "Dead: other", 1, 0))
+## Get the data for exercise 2
+melanoma_raw <- read.dta("http://biostat3.net/download/melanoma.dta")
+
+## Examine the data
+head(melanoma_raw)
+
+## Create 0/1 outcome variable
+melanoma <- melanoma_raw %>%
+    mutate(death_cancer = ifelse( status == "Dead: cancer", 1, 0),
+           death_all = ifelse( status == "Dead: cancer" |
+                               status == "Dead: other", 1, 0))
 
 ## @knitr a_tabulate
+## Tabulate by stage
 melanoma %>%
     group_by(stage) %>%
-    summarise(Freq = n(), Percent = n()/dim(melanoma)[1]) %>%
+    summarise(Freq = n(), Percent = n() / nrow(.)) %>%
     mutate(Cum = cumsum(Percent))
 
+summary( ~ stage, melanoma)
+
 ## @knitr a_plotSurv
+par(mfrow=c(1, 2))
 mfit <- survfit(Surv(surv_mm, death_cancer) ~ stage, data = melanoma)
-p1 <- ggsurv(mfit, cens.shape="|", cens.col = "black") +
-    ggtitle("Kaplan-Meier survival estimates") + theme(legend.position="bottom")
-p2 <- ggplot(smoothHazard(melanoma,"stage"), aes(x=Time, y=Hazard, colour= stage)) +
-    geom_line() + ggtitle("Smoothed Hazard estimates") + theme(legend.position="bottom")
-grid.arrange(p1, p2, ncol=2)
+
+plot(mfit, col=c("yellow", "green","blue", "red"),
+     xlab = "Follow-up Time",
+     ylab = "Survival")
+
+hazByGroup <- function(group){
+    with(subset(melanoma, group),
+         muhaz(times=surv_mm,
+               delta=death_cancer,
+               min.time = min(surv_mm),
+               max.time = max(surv_mm)))
+}
+
+plot(hazByGroup(melanoma$stage=="Distant"), col="red", xlim=c(0,250))
+lines(hazByGroup(melanoma$stage=="Regional"), col="blue")
+lines(hazByGroup(melanoma$stage=="Localised"), col="green")
+lines(hazByGroup(melanoma$stage=="Unknown"), col="yellow")
+legend("topright", c("Unkown", "Localised", "Regional", "Distant"), col=c("yellow", "green","blue", "red"), lty = 1)
 
 ## @knitr b_crudeRates
 melanoma %>%
@@ -67,7 +74,7 @@ melanoma %>%
     mutate(CI_low = Rate + qnorm(0.025) * Rate / sqrt(D),
            CI_high = Rate + qnorm(0.975) * Rate / sqrt(D))
 
-## @knitr c_crudeRates1000 
+## @knitr c_crudeRates1000
 melanoma %>%
     select(death_cancer, surv_yy, stage) %>%
     group_by(stage) %>%
@@ -84,36 +91,58 @@ melanoma %>%
            CI_high = Rate + qnorm(0.975) * Rate / sqrt(D))
 
 ## @knitr d_plotSurv_sex
+par(mfrow=c(1, 2))
 sfit <- survfit(Surv(surv_mm, death_cancer) ~ sex, data = melanoma)
-p3 <- ggsurv(sfit, cens.shape="|", cens.col = "black") +
-    ggtitle("Kaplan-Meier survival estimates") + theme(legend.position="bottom")
-p4 <- ggplot(smoothHazard(melanoma, "sex"), aes(x=Time, y=Hazard, colour= sex)) +
-    geom_line() + ggtitle("Smoothed Hazard estimates") + theme(legend.position="bottom")
-grid.arrange(p3, p4, ncol=2)
+
+plot(sfit, col=c("blue", "red"),
+     xlab = "Follow-up Time",
+     ylab = "Survival")
+
+plot(hazByGroup(melanoma$sex=="Male"), col="red", xlim=c(0,250))
+lines(hazByGroup(melanoma$sex=="Female"), col="blue")
+legend("topright", c("Male", "Female"), col=c("red", "blue"), lty = 1)
 
 ## @knitr e_tabByAge
 with(melanoma,table(status, agegrp))
 
 ## @knitr f_survStage
+par(mfrow=c(1, 1))
 afit <- survfit(Surv(surv_mm, death_all) ~ stage, data = melanoma)
-ggsurv(afit, cens.shape="|", cens.col = "black") + theme(legend.position="bottom") +
-    ggtitle("Kaplan-Meier survival estimates\nAll-cause")
+plot(afit, col=c("yellow", "green","blue", "red"),
+     xlab = "Follow-up Time",
+     ylab = "Survival",
+     main = "Kaplan-Meier survival estimates\nAll-cause")
+legend("topright", c("Unkown", "Localised", "Regional", "Distant"), col=c("yellow", "green","blue", "red"), lty = 1)
 
 ## @knitr g_allCa75p
+par(mfrow=c(1, 2))
 mfit75 <- survfit(Surv(surv_mm, death_cancer) ~ stage, data = subset(melanoma,agegrp=="75+"))
+plot(mfit75, col=c("yellow", "green","blue", "red"),
+     xlab = "Follow-up Time",
+     ylab = "Survival",
+     main = "Kaplan-Meier survival estimates\nCancer | Age 75+")
+legend("topright", c("Unkown", "Localised", "Regional", "Distant"), col=c("yellow", "green","blue", "red"), lty = 1)
+
 afit75 <- survfit(Surv(surv_mm, death_all) ~ stage, data = subset(melanoma,agegrp=="75+"))
-p6 <- ggsurv(mfit75, cens.shape="|", cens.col = "black") + theme(legend.position="bottom") +
-    ggtitle("Kaplan-Meier survival estimates\nCancer | Age 75+")
-p7 <- ggsurv(afit75, cens.shape="|", cens.col = "black") + theme(legend.position="bottom") +
-    ggtitle("Kaplan-Meier survival estimates\nAll-cause | Age 75+")
-grid.arrange(p6, p7, ncol=2)
+plot(afit75, col=c("yellow", "green","blue", "red"),
+     xlab = "Follow-up Time",
+     ylab = "Survival",
+     main = "Kaplan-Meier survival estimates\nAll-cause | Age 75+")
+legend("topright", c("Unkown", "Localised", "Regional", "Distant"), col=c("yellow", "green","blue", "red"), lty = 1)
 
-## @knitr h_allCaAgeGrp 
+## @knitr h_allCaAgeGrp
+par(mfrow=c(1, 2))
 mfitage <- survfit(Surv(surv_mm, death_cancer) ~ agegrp, data = melanoma)
-afitage <- survfit(Surv(surv_mm, death_all) ~ agegrp, data = melanoma)
-p8 <- ggsurv(mfitage, cens.shape="|", cens.col = "black") + theme(legend.position="bottom") +
-    ggtitle("Kaplan-Meier estimates of\ncancer survival by age group")
-p9 <- ggsurv(afitage, cens.shape="|", cens.col = "black") + theme(legend.position="bottom") +
-    ggtitle("Kaplan-Meier estimates of\nall-cause survival by age group")
-grid.arrange(p8, p9, ncol=2)
+plot(mfitage, col=c("yellow", "green","blue", "red"),
+     xlab = "Follow-up Time",
+     ylab = "Survival",
+     main = "Kaplan-Meier estimates of\ncancer survival by age group")
+legend("topright", c("0-44", "45-59", "60-74", "75+"), col=c("yellow", "green","blue", "red"), lty = 1)
 
+afitage <- survfit(Surv(surv_mm, death_all) ~ agegrp, data = melanoma)
+afit75 <- survfit(Surv(surv_mm, death_all) ~ stage, data = subset(melanoma,agegrp=="75+"))
+plot(afitage, col=c("yellow", "green","blue", "red"),
+     xlab = "Follow-up Time",
+     ylab = "Survival",
+     main = "Kaplan-Meier estimates of\nall-cause survival by age group")
+legend("topright", c("0-44", "45-59", "60-74", "75+"), col=c("yellow", "green","blue", "red"), lty = 1)
