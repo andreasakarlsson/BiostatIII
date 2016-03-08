@@ -32,15 +32,14 @@ melanoma %>%
     summarise(Freq = n(), Percent = n() / nrow(.)) %>%
     mutate(Cum = cumsum(Percent))
 
-summary( ~ stage, melanoma)
-
 ## @knitr a_plotSurv
 par(mfrow=c(1, 2))
 mfit <- survfit(Surv(surv_mm, death_cancer) ~ stage, data = melanoma)
 
-plot(mfit, col=c("yellow", "green","blue", "red"),
+plot(mfit, col=1:4,
      xlab = "Follow-up Time",
      ylab = "Survival")
+legend("topright", levels(melanoma$stage), col=1:4, lty = 1)
 
 hazByGroup <- function(group){
     with(subset(melanoma, group),
@@ -50,11 +49,11 @@ hazByGroup <- function(group){
                max.time = max(surv_mm)))
 }
 
-plot(hazByGroup(melanoma$stage=="Distant"), col="red", xlim=c(0,250))
-lines(hazByGroup(melanoma$stage=="Regional"), col="blue")
-lines(hazByGroup(melanoma$stage=="Localised"), col="green")
-lines(hazByGroup(melanoma$stage=="Unknown"), col="yellow")
-legend("topright", c("Unkown", "Localised", "Regional", "Distant"), col=c("yellow", "green","blue", "red"), lty = 1)
+plot(hazByGroup(melanoma$stage=="Unknown"), col=1, xlim=c(0,250), ylim=c(0,0.08))
+lines(hazByGroup(melanoma$stage=="Localised"), col=2)
+lines(hazByGroup(melanoma$stage=="Regional"), col=3)
+lines(hazByGroup(melanoma$stage=="Distant"), col=4)
+legend("topright", levels(melanoma$stage), col=1:4, lty = 1)
 
 ## @knitr b_crudeRates
 melanoma %>%
@@ -94,13 +93,14 @@ melanoma %>%
 par(mfrow=c(1, 2))
 sfit <- survfit(Surv(surv_mm, death_cancer) ~ sex, data = melanoma)
 
-plot(sfit, col=c("blue", "red"),
+plot(sfit, col=1:2,
      xlab = "Follow-up Time",
      ylab = "Survival")
+legend("bottomleft", levels(melanoma$sex), col=1:2, lty = 1)
 
-plot(hazByGroup(melanoma$sex=="Male"), col="red", xlim=c(0,250))
-lines(hazByGroup(melanoma$sex=="Female"), col="blue")
-legend("topright", c("Male", "Female"), col=c("red", "blue"), lty = 1)
+plot(hazByGroup(melanoma$sex=="Male"), col=1, xlim=c(0,250))
+lines(hazByGroup(melanoma$sex=="Female"), col=2)
+legend("topright", levels(melanoma$sex), col=1:2, lty = 1)
 
 ## @knitr e_tabByAge
 with(melanoma,table(status, agegrp))
@@ -108,41 +108,41 @@ with(melanoma,table(status, agegrp))
 ## @knitr f_survStage
 par(mfrow=c(1, 1))
 afit <- survfit(Surv(surv_mm, death_all) ~ stage, data = melanoma)
-plot(afit, col=c("yellow", "green","blue", "red"),
+plot(afit, col=1:4,
      xlab = "Follow-up Time",
      ylab = "Survival",
      main = "Kaplan-Meier survival estimates\nAll-cause")
-legend("topright", c("Unkown", "Localised", "Regional", "Distant"), col=c("yellow", "green","blue", "red"), lty = 1)
+legend("topright", levels(melanoma$stage), col=1:4, lty = 1)
 
 ## @knitr g_allCa75p
 par(mfrow=c(1, 2))
 mfit75 <- survfit(Surv(surv_mm, death_cancer) ~ stage, data = subset(melanoma,agegrp=="75+"))
-plot(mfit75, col=c("yellow", "green","blue", "red"),
+plot(mfit75, col=1:4,
      xlab = "Follow-up Time",
      ylab = "Survival",
      main = "Kaplan-Meier survival estimates\nCancer | Age 75+")
-legend("topright", c("Unkown", "Localised", "Regional", "Distant"), col=c("yellow", "green","blue", "red"), lty = 1)
+legend("topright", levels(melanoma$stage), col=1:4, lty = 1)
 
 afit75 <- survfit(Surv(surv_mm, death_all) ~ stage, data = subset(melanoma,agegrp=="75+"))
-plot(afit75, col=c("yellow", "green","blue", "red"),
+plot(afit75, col=1:4,
      xlab = "Follow-up Time",
      ylab = "Survival",
      main = "Kaplan-Meier survival estimates\nAll-cause | Age 75+")
-legend("topright", c("Unkown", "Localised", "Regional", "Distant"), col=c("yellow", "green","blue", "red"), lty = 1)
+legend("topright", levels(melanoma$stage), col=1:4, lty = 1)
 
 ## @knitr h_allCaAgeGrp
 par(mfrow=c(1, 2))
 mfitage <- survfit(Surv(surv_mm, death_cancer) ~ agegrp, data = melanoma)
-plot(mfitage, col=c("yellow", "green","blue", "red"),
+plot(mfitage, col=1:4,
      xlab = "Follow-up Time",
      ylab = "Survival",
      main = "Kaplan-Meier estimates of\ncancer survival by age group")
-legend("topright", c("0-44", "45-59", "60-74", "75+"), col=c("yellow", "green","blue", "red"), lty = 1)
+legend("topright", levels(melanoma$agegrp), col=1:4, lty = 1)
 
 afitage <- survfit(Surv(surv_mm, death_all) ~ agegrp, data = melanoma)
 afit75 <- survfit(Surv(surv_mm, death_all) ~ stage, data = subset(melanoma,agegrp=="75+"))
-plot(afitage, col=c("yellow", "green","blue", "red"),
+plot(afitage, col=1:4,
      xlab = "Follow-up Time",
      ylab = "Survival",
      main = "Kaplan-Meier estimates of\nall-cause survival by age group")
-legend("topright", c("0-44", "45-59", "60-74", "75+"), col=c("yellow", "green","blue", "red"), lty = 1)
+legend("topright", levels(melanoma$agegrp), col=1:4, lty = 1)
