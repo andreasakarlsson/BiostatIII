@@ -3,26 +3,17 @@
 ## Edited: Andreas Karlsson, 2015-02-28
 ###############################################################################
 
-## Install needed packages only need to be done once
-## install.packages(readstata13) #Needed to read data set from Stata 13
-## install.packages(survival) #for Surv and survfit
-## install.packages(KMsurv)
-## install.packages(dplyr)
-
-
-
 ###############################################################################
 ## Exercise 4
 ###############################################################################
 ## @knitr loadDependecies
-require(readstata13) #Needed to read data set from Stata 13
-require(survival) #for Surv and survfit
+require(foreign)  # for reading data set from Stata
+require(survival) # for Surv and survfit
 require(KMsurv)
-require(dplyr)
-
+require(dplyr)    # for data manipulation
 
 ## @knitr loadPreprocess
-melanoma_raw<- read.dta13("http://biostat3.net/download/melanoma.dta")
+melanoma_raw<- read.dta("http://biostat3.net/download/melanoma.dta")
 melanoma <- melanoma_raw %>%
     filter(stage=="Localised") %>%
     mutate(year = floor(surv_yy),
@@ -47,9 +38,4 @@ summary(mfit_years)
 
 ## @knitr kmMonths
 mfit_months <- survfit(Surv(month, death_cancer) ~ 1, data = melanoma)
-data.frame(summary(mfit_months)[c(2:4,6,8,10,9)])[110:130,] 
-
-
-
-
-
+data.frame(summary(mfit_months)[c(2:4,6,8,10,9)])[110:130,]

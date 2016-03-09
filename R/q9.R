@@ -14,9 +14,9 @@
 ###############################################################################
 ## @knitr loadDependecies
 
-require(survival)
-require(dplyr)
-require(readstata13)
+require(survival) # for Surv and survfit
+require(dplyr)    # for data manipulation
+require(foreign)  # for reading data set from Stata
 
 ###########################################
 ### A help function to calculate ###
@@ -34,7 +34,7 @@ IRR <- function(fit){
 
 ## @knitr loadPreprocess
 ## Read melanoma data, select subcohorts and create a death indicator
-melanoma.l <- tbl_df( read.dta13("http://biostat3.net/download/melanoma.dta") ) %>%
+melanoma.l <- tbl_df( read.dta("http://biostat3.net/download/melanoma.dta") ) %>%
     filter(stage=="Localised") %>%
     mutate(death_cancer = as.numeric(status=="Dead: cancer"))
 
@@ -132,6 +132,3 @@ colnames(IRfit9f) <- c("IRR", "Std. err", "CI_lower", "CI_upper")
 IRfit9f
 
 summary(coxfit9e)
-
-
-

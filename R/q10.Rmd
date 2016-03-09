@@ -4,7 +4,7 @@ Laboratory exercise 10
 -----------
 
 ### Suggested solutions by
-Author: Annika Tillander, Andreas Karlsson, 2015-03-01
+Author: Annika Tillander, Andreas Karlsson, 2015-03-01 <br/>
 
 
 ## Examining the proportional hazards hypothesis (localised melanoma)
@@ -13,8 +13,8 @@ Author: Annika Tillander, Andreas Karlsson, 2015-03-01
 
 Load the diet data using time-on-study as the timescale.
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q10.R')
 opts_chunk$set(cache=FALSE)
 ```

@@ -4,8 +4,8 @@ Laboratory exercise 4
 -----------
 
 ### Suggested solutions by
-Author: Annika Tillander, 2014-01-30  
-Edited: Andreas Karlsson, 2015-03-01
+Author: Annika Tillander, 2014-01-30 <br/>
+Edited: Andreas Karlsson, 2015-03-01, 2016-03-08
 
 ## Localised melanoma: Comparing actuarial and Kaplan-Meier approaches with discrete time data
 
@@ -17,8 +17,8 @@ For the patients diagnosed with localised skin melanoma, estimate the 10-year ca
 
 In order to reproduce the results in the printed solutions you’ll need to restrict to localised stage and estimate cause-specific survival ("Dead: cancer" indicates an event). Look at the code in the previous questions if you are unsure.
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q4.R')
 opts_chunk$set(cache=FALSE)
 ```
@@ -28,7 +28,7 @@ You may have to install the required packages the first time you use them. You c
 ```{r loadDependecies, message=FALSE}
 ```
 
-**(a)** Of the two estimates (Kaplan-Meier and actuarial) made using time recorded in years, which do you think is the most appropriate and why? [HINT: Consider how each of the methods handle ties.]  
+**(a)** Of the two estimates (Kaplan-Meier and actuarial) made using time recorded in years, which do you think is the most appropriate and why? [HINT: Consider how each of the methods handle ties.]
 **(b)** Which of the two estimates (Kaplan-Meier or actuarial) changes most when using survival time in months rather than years? Why?
 
 
@@ -54,4 +54,3 @@ Kaplan-Meier estimates, using survival time in completed months. Only showing 20
 
 ```{r kmMonths}
 ```
-	

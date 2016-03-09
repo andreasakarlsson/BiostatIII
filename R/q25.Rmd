@@ -10,8 +10,8 @@ Author: Bénédicte Delcoigne, 2015-03-06
 
 -----------
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q25.R')
 opts_chunk$set(cache=FALSE)
 ```

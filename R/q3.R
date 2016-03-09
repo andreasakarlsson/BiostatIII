@@ -8,16 +8,17 @@
 ###############################################################################
 ## @knitr loadDependecies
 require(foreign)  # needed to read data set from Stata
-require(survival) #for Surv and survfit
-require(muhaz)    #for hazard estimates
+require(survival) # for Surv and survfit
+require(muhaz)    # for hazard estimates
 require(dplyr)    # for data manipulation
 
 ## @knitr loadPreprocess
 melanoma_raw <- read.dta("http://biostat3.net/download/melanoma.dta")
 melanoma <- melanoma_raw %>%
-    filter(stage=="Localised") %>%
+    filter(stage=="Localised") %>% # subset those with localised cancer
     mutate(death_cancer = ifelse( status == "Dead: cancer", 1, 0),
-           death_all = ifelse( status == "Dead: cancer" | status == "Dead: other", 1, 0))
+           death_all = ifelse( status == "Dead: cancer" |
+                               status == "Dead: other", 1, 0))
 
 ## @knitr a_survDiaDate
 mfityear8594 <- survfit(Surv(surv_mm, death_cancer==1) ~ year8594, data = melanoma)

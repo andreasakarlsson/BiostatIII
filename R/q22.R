@@ -12,9 +12,9 @@
 ## Exercise 22
 ###############################################################################
 ## @knitr loadDependecies
-require(foreign) #Needed to read data set from Stata 13
-require(survival) #for Surv and survfit
-require(dplyr)
+require(foreign)  # for reading data set from Stata
+require(survival) # for Surv and survfit
+require(dplyr)    # for data manipulation
 
 ###########################################
 ### A help function to calculate ###
@@ -115,7 +115,7 @@ brvSplit3 <- brvSplit2 %>%
     mutate(age_sp_dth =  as.numeric(dosp - dob) / 365.24, # Age at spouse death
            age_start = age_sp_dth + y_before_sp_dth,      # Age at start of timeband
            age_end = age_sp_dth + y_after_sp_dth)         # Age at end of timeband
-          
+
 age_cat <- seq(70,100,5) # Split at these ages
 brvSplit4 <- survSplit(brvSplit3, cut=age_cat, start="age_start", end="age_end", event="fail", zero = 0)
 
@@ -124,7 +124,7 @@ brvSplit4 <- mutate(brvSplit4,
                     age = cut(age_end, age_cat))   # Creating age band category
 
 ## Calculate crude rates
-brvSplit4 %>% 
+brvSplit4 %>%
     select(fail, age, t_at_risk) %>%
     group_by(age) %>%
     summarise(D = sum(fail), Y = sum(t_at_risk), Rate = D/Y) %>%

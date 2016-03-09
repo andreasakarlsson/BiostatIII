@@ -4,7 +4,7 @@
 
 ## Install needed packages only need to be done once
 ## install.packages("survival")
-## install.packages("readstata13")
+## install.packages("foreign")
 ## install.packages("dplyr")
 ## install.packages("ggplot2")
 ## install.packages("muhaz")
@@ -13,19 +13,19 @@
 ## Exercise 10
 ###############################################################################
 ## @knitr loadDependecies
-require(readstata13) #Needed to read data set from Stata 13
-require(survival) #for Surv and survfit
+require(foreign)  # for reading data set from Stata
+require(survival) # for Surv and survfit
 require(muhaz) #for hazard estimates
-require(dplyr)
+require(dplyr)    # for data manipulation
 require(ggplot2)
 
 
 ## @knitr loadPreprocess
-melanoma_raw <- read.dta13("http://biostat3.net/download/melanoma.dta")
+melanoma_raw <- read.dta("http://biostat3.net/download/melanoma.dta")
 melanoma <- melanoma_raw %>%
     filter(stage == "Localised") %>%
     mutate(death_cancer = ifelse( status == "Dead: cancer" & surv_mm <= 120, 1, 0), #censuring for > 120 monts
-           trunk_yy = ifelse(surv_mm <=  120, surv_mm/12, 10))  #scale to years and trunkate to 10 years 
+           trunk_yy = ifelse(surv_mm <=  120, surv_mm/12, 10))  #scale to years and trunkate to 10 years
 
 ## @knitr 10.a
 # Using muhaz to smooth the kaplan-meier hazards by strata the time and bandwidth options were selected based on smoother performance.
@@ -100,6 +100,3 @@ summary(cox2p8Split2)
 
 ## Alternative approach that I did not get to work at:
 ## http://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf
-
-
-

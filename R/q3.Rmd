@@ -4,15 +4,15 @@ Laboratory exercise 3
 -----------
 
 ### Suggested solutions by
-Author: Annika Tillander, 2014-01-30  
-Edited: Andreas Karlsson, 2015-02-28
+Author: Annika Tillander, 2014-01-30 <br/>
+Edited: Andreas Karlsson, 2015-02-28, 2016-03-08
 
 Localised melanoma: Comparing estimates of cause-specific survival between periods; first graphically and then using the log rank test
 
 -----------
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q3.R')
 opts_chunk$set(cache=FALSE, fig.width=10, fig.height=6)
 ```
@@ -32,9 +32,9 @@ We will now analyse the full data set of patients diagnosed with localised skin 
 ```{r a_survDiaDate}
 ```
 
-**(b)** The following commands can be used to plot the hazard function (instantaneous mortality rate):  
-	i.  At what point in the follow-up is mortality highest?  
-	ii. Does this pattern seem reasonable from a clinicial/biological perspective? [HINT:Consider the disease with which these patients were classified as being diagnosed along with the expected fatality of the disease as a function of time since diagnosis.]  
+**(b)** The following commands can be used to plot the hazard function (instantaneous mortality rate):
+	i.  At what point in the follow-up is mortality highest?
+	ii. Does this pattern seem reasonable from a clinicial/biological perspective? [HINT:Consider the disease with which these patients were classified as being diagnosed along with the expected fatality of the disease as a function of time since diagnosis.]
 
 ```{r b_hazDiaDate}
 ```
@@ -43,7 +43,7 @@ We will now analyse the full data set of patients diagnosed with localised skin 
 
 ```{r c_testDiaDate}
 ```
-	
+
 Haven’t heard of the log rank (or Wilcoxon) test? It’s possible you may reach this exercise before we cover the details of these tests during lectures. You should nevertheless do the exercise and try and interpret the results. Both of these tests (the log rank and the generalised Wilcoxon) are used to test for differences between the survivor functions. The null hypothesis is that the survivor functions are equivalent for the two calendar periods (i.e., patient survival does not depend on calendar period of diagnosis).
 
 **(d)** Estimate cause-specific mortality rates for each age group, and graph Kaplan-Meier estimates of the cause-specific survivor function for each age group. Are there differences between the age groups? Is the interpretation consistent between the mortality rates and the survival proportions?
@@ -65,4 +65,3 @@ What are the units of the estimated hazard rates? HINT: look at how you defined 
 
 ```{r f_sexDiff}
 ```
-

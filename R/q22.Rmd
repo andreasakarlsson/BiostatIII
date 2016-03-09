@@ -16,8 +16,8 @@ These data were used to study a possible effect of marital bereavement (loss of 
 -----------
 
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q22.R')
 opts_chunk$set(cache=FALSE)
 ```
@@ -26,7 +26,7 @@ You may have to install the required packages the first time you use them. You c
 
 ```{r loadDependecies, message=FALSE}
 ```
-	
+
 **(a)** Load the bereavement data and explore it.
 
 ```{r loadPreprocess, results='hide'}

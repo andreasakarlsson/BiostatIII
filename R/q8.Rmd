@@ -4,10 +4,10 @@ Laboratory exercise 8
 -----------
 
 ### Suggested solutions by
-Author: Annika Tillander, 2014-01-30  
-Edited: Andreas Karlsson, 2015-03-01  
-        Benedicte Delcoigne, 2015-03-03  
-        Johan Zetterqvist, 2015-03-04
+Author: Annika Tillander, 2014-01-30 <br/>
+Edited: Andreas Karlsson, 2015-03-01, 2016-03-09 <br/>
+        Benedicte Delcoigne, 2015-03-03 <br/>
+        Johan Zetterqvist, 2015-03-04 <br/>
 
 ## Diet data: Using Poisson regression to study the effect of energy intake adjusting for confounders on two different timescales
 
@@ -19,8 +19,8 @@ Fit models both without adjusting for ‘time’ and by adjusting for attained a
 
 Load the diet data using time-on-study as the timescale.
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q8.R')
 opts_chunk$set(cache=FALSE)
 ```
@@ -88,6 +88,3 @@ The effect of high energy intake is somewhat confounded by age, but also confoun
 ```{r 8.e.i,  message=FALSE}
 ```
 Compare the results with the analysis adjusted for attained age. Are there any differences? Why (or why not)? Go back to the graphs at the beginning of the exercise and look for explanations.
-
-
-

@@ -6,27 +6,27 @@
 ## Install needed packages only need to be done once
 ## install.packages("survival")
 ## install.packages("dplyr")
-## install.packages("readstata13")
+## install.packages("foreign")
 
 ###############################################################################
 ## Exercise 11
 ###############################################################################
 ## @knitr loadDependecies
 
-require(survival)
-require(dplyr)
-require(readstata13)
+require(survival) # for Surv and survfit
+require(dplyr)    # for data manipulation
+require(foreign)  # for reading data set from Stata
 
 ## @knitr loadPreprocess
 
 ## Read melanoma data
 ## and select subcohorts
 melanoma.l <-
-  
-  tbl_df( read.dta13("http://biostat3.net/download/melanoma.dta") ) %>%
-  
+
+  tbl_df( read.dta("http://biostat3.net/download/melanoma.dta") ) %>%
+
   filter(stage=="Localised") %>%
-  
+
   mutate(
     ## Create a death indicator
     death_cancer = as.numeric(status=="Dead: cancer"),
@@ -36,7 +36,7 @@ melanoma.l <-
 ## Truncate follow-up time
 
 melanoma.l2 <-
-  
+
   mutate(melanoma.l,
          ## Create new death indicators (only count deaths within 120 months)
          death_cancer = death_cancer * as.numeric( surv_mm <= 120),
@@ -55,4 +55,3 @@ summary( coxfit11a <- coxph(Surv(surv_mm, death_any) ~ sex + year8594 + agegrp,
 summary( coxfit11b <- coxph(Surv(surv_mm, death_cancer) ~ sex + year8594 + agegrp,
                            data = melanoma.l2,
                            ties = "breslow") )
-

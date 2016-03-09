@@ -4,7 +4,7 @@ Laboratory exercise 9
 -----------
 
 ### Suggested solutions by
-Author: Annika Tillander, Johan Zetterqvist  2014-03-03, 
+Author: Annika Tillander, Johan Zetterqvist  2014-03-03
 
 ## Localised melanoma: modelling cause-specific mortality using Cox regression
 
@@ -15,8 +15,8 @@ To fit a Cox proportional hazards model (for cause-specific survival) with calen
 -----------
 
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q9.R')
 opts_chunk$set(cache=FALSE)
 ```
@@ -75,7 +75,7 @@ iii. Do both models assume proportional hazards? Explain.
 ```{r 9.e}
 ```
 
-**(f)** ADVANCED: By splitting at each failure time we can estimate a Poisson regression model that is identical to the Cox model. 
+**(f)** ADVANCED: By splitting at each failure time we can estimate a Poisson regression model that is identical to the Cox model.
 
 ```{r 9.f}
 ```

@@ -4,7 +4,7 @@ Laboratory exercise 13
 -----------
 
 ### Suggested solutions by
-Author: Johan Zetterqvist, 2015-03-04
+Author: Johan Zetterqvist, 2015-03-04 <br/>
 
 
 ## Modelling the diet data using Cox regression
@@ -13,8 +13,8 @@ Author: Johan Zetterqvist, 2015-03-04
 
 Now fit a model to the localised melanoma data where the outcome is observed survival (i.e. all deaths are considered to be events).
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q13.R')
 opts_chunk$set(cache=FALSE)
 ```

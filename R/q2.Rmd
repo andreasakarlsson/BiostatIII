@@ -4,7 +4,8 @@ Laboratory exercise 2
 -----------
 
 ### Suggested solutions by
-Author: Annika Tillander, 2014-01-30
+
+Author: Annika Tillander, 2014-01-30 <br/>
 Edited: Andreas Karlsson, 2015-02-28, 2016-03-07
 
 Comparing survival, proportions and mortality rates by stage for cause-specific and

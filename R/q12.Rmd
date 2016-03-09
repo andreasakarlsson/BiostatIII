@@ -4,7 +4,7 @@ Laboratory exercise 12
 -----------
 
 ### Suggested solutions by
-Author: Andreas Karlsson, 2015-03-06
+Author: Andreas Karlsson, 2015-03-06 <br/>
 
 
 ## Cox model for cause-specific mortality for melanoma (all stages)
@@ -15,8 +15,8 @@ Use Cox regression to model the cause-specific survival of patients with skin me
 -----------
 
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q12.R')
 opts_chunk$set(cache=FALSE)
 ```

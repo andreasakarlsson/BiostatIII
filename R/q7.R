@@ -13,9 +13,9 @@
 ## install.packages("car")
 
 ## @knitr loadDependecies
-require(survival)
-require(dplyr)
-require(readstata13)
+require(survival) # for Surv and survfit
+require(dplyr)    # for data manipulation
+require(foreign)  # for reading data set from Stata
 
 
 ###########################################
@@ -36,7 +36,7 @@ IRR <- function(fit){
 
 ## @knitr loadPreprocess
 ## Read melanoma data
-melanoma <- tbl_df( read.dta13("http://biostat3.net/download/melanoma.dta") )
+melanoma <- tbl_df( read.dta("http://biostat3.net/download/melanoma.dta") )
 
 ## Create a new dataset with only localised cancer
 melanoma.l <- filter(melanoma, stage=="Localised")

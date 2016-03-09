@@ -2,30 +2,24 @@
 ## Author: Benedicte Delcoigne, 2014-03-05
 ###############################################################################
 
-
-## Install needed packages only need to be done once
-## install.packages("readstata13")
-## install.packages("survival")
-## install.packages("Epi")
-
 ###############################################################################
 ## Exercise 25
 ###############################################################################
 
 ## In order to load data from Stata you need package "foreign"
-## In order to read data from Stata 13 you need package "readstata13"
+## In order to read data from Stata 13 you need package "foreign"
 
 ## @knitr loadDependecies
-require(survival)     # cox and conditional logistic analyses 
-require(readstata13)  # read stata13 datasets
-require(Epi)          # sample a nested case-control study from a cohort
+require(foreign)  # for reading data set from Stata
+require(survival) # cox and conditional logistic analyses
+require(Epi)      # sample a nested case-control study from a cohort
 
 ## @knitr loadPreprocess
-## Get the data for exercise 25 and have a look at it 
-mel <- read.dta13("http://biostat3.net/download/melanoma.dta")
+## Get the data for exercise 25 and have a look at it
+mel <- read.dta("http://biostat3.net/download/melanoma.dta")
 head(mel)
 mel <- subset(mel , stage=="Localised")               # restrict the cohort to stage==1
-num_dupli  <- length(mel$id) - length(unique(mel$id)) # check if one line is one individual 
+num_dupli  <- length(mel$id) - length(unique(mel$id)) # check if one line is one individual
 num_dupli                                             # will be 0  if true
 str(mel$status)                                       # check the structure of "status"
 table (mel$status, useNA="always")                    # check the categories of "status"
@@ -41,7 +35,7 @@ table(mel$dc , mel$status)                            # check
 
 ## @knitr ex_25_coxph
 str(mel$sex) ; str(mel$year8594) ; str(mel$agegrp)    #Check structure of risk factors/confounders
-out_coh <- coxph(Surv(surv_10y,dc) ~ sex + year8594 + agegrp, data = mel, ties="breslow" )  
+out_coh <- coxph(Surv(surv_10y,dc) ~ sex + year8594 + agegrp, data = mel, ties="breslow" )
 summary(out_coh)
 
 
@@ -50,9 +44,7 @@ summary(out_coh)
 n_ind <- length(mel$id)
 n_ind
 
-
-
-## @knitr n_event 
+## @knitr n_event
 table(mel$dc, useNA="always")
 ncase <-  table (mel$dc, useNA="always")[2]
 ncase
@@ -60,7 +52,7 @@ ncase
 
 ## @knitr gen_ncc
 nccdata <-ccwc( entry=0, exit=surv_10y , fail=dc, origin=0, controls=1, include=list(sex,year8594,agegrp,dc,id), data=mel )
-tail(nccdata, 8)     
+tail(nccdata, 8)
 
 
 ## @knitr clogit
@@ -83,7 +75,7 @@ var                            # print the variances of estimates from the cohor
 
 ## @knitr loop_ncc
 M <- 10                   # Number of loops: change the M value to change the number of loops
-param   <- matrix(0,M,5)  # Define the matrice of the coefficients 
+param   <- matrix(0,M,5)  # Define the matrice of the coefficients
 for (i in 1:M)  {         # Start of the loop, create NCC data and analyse it
     nccdata <-ccwc( entry=0, exit=surv_10y , fail=dc, origin=0, controls=1, include=list(sex,year8594,agegrp), data=mel )
     out_ncc <- clogit(Fail ~ sex + year8594 + agegrp + strata(Set), data=nccdata)
@@ -91,8 +83,8 @@ for (i in 1:M)  {         # Start of the loop, create NCC data and analyse it
 }                  # End of the loop
 
 ## @knitr output
-param <- as.data.frame(param)        # data frame with the coefficients 
-param <- exp(param)                  # data frame with the HR    
+param <- as.data.frame(param)        # data frame with the coefficients
+param <- exp(param)                  # data frame with the HR
 param <- rbind (summary(out_coh)$coef[c(1:5),2], param)
 colnames(param) <- c("sex Female","year_8594","agegrp45-59","agegrp60-74","agegrp75+")
 rownames(param) <- c("cohort", c(1:M))
@@ -121,4 +113,3 @@ hist(param[,5], main="agegrp75+", xlab="HR value")   # histogram of HR for varia
 abline(v=summary(out_coh)$coef[5,2], col="green")
 abline(v=mean_param[5], col="red")
                                         # obs: the vertical green line is at the cohort's HR value, the red line at the mean of the M loops
-

@@ -3,17 +3,15 @@
 ## Edited: Andreas Karlsson, 2015-02-17, 2016-03-01
 ###############################################################################
 
-
-
 ###############################################################################
 ## Exercise 1b
 ###############################################################################
 
 ## @knitr loadDependecies
-require(foreign)  # needed to read data set from Stata
+require(foreign)  # for reading data set from Stata
 require(dplyr)    # for data manipulation
 require(KMsurv)   # for life-tables
-require(survival) # for Kaplan-Meier
+require(survival) # for Surv and survfit
 
 ## Get the data for exercise 1
 colon_sample <- read.dta("http://biostat3.net/download/colon_sample.dta")

@@ -4,7 +4,7 @@
 
 ## Install needed packages only need to be done once
 ## install.packages("survival")
-## install.packages("readstata13")
+## install.packages("foreign")
 ## install.packages("dplyr")
 
 
@@ -12,17 +12,17 @@
 ## Exercise 12
 ###############################################################################
 ## @knitr loadDependecies
-require(readstata13) #Needed to read data set from Stata 13
-require(survival) #for Surv and survfit
-require(dplyr)
+require(foreign)  # for reading data set from Stata
+require(survival) # for Surv and survfit
+require(dplyr)    # for data manipulation
 
 
 
 ## @knitr loadPreprocess
-melanoma_raw<- read.dta13("http://biostat3.net/download/melanoma.dta")
+melanoma_raw<- read.dta("http://biostat3.net/download/melanoma.dta")
 melanoma <- melanoma_raw %>%
     mutate(death_cancer = ifelse( status == "Dead: cancer", 1, 0))
-          
+
 
 ## @knitr 12.a
 

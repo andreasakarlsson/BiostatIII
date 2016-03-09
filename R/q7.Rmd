@@ -19,8 +19,8 @@ The aim of these exercises is to explore the similarities and differences to the
 
 Load the diet data using time-on-study as the timescale.
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q7.R')
 opts_chunk$set(cache=FALSE)
 ```
@@ -52,7 +52,7 @@ During which calendar period (the early or the latter) is mortality the lowest?
 iii. Is the interpretation (with respect to how prognosis depends on period) based on the hazard consistent with the interpretation of the survival plot?
 
 ```{r 7.a.iii,  message=FALSE}
-```	
+```
 
 **(b)** Estimate the cause-specific mortality rate for each calendar period.
 
@@ -66,7 +66,7 @@ During which calendar period (the early or the latter) is mortality the lowest? 
 Two approaches for controlling for confounding are ‘restriction’ and ‘statistical adjustment’. We will first use restriction to control for confounding. We will restrict the potential follow-up time to a maximum of 120 months. Individuals who survive more than 120 months are censored at 120 months.
 
 i. Estimate the cause-specific mortality rate for each calendar period.
-	
+
 ```{r 7.c.i,  message=FALSE}
 ```
 

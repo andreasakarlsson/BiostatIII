@@ -7,9 +7,9 @@
 ## Exercise 2
 ###############################################################################
 ## @knitr loadDependecies
-require(foreign)  # needed to read data set from Stata
-require(survival) #for Surv and survfit
-require(muhaz)    #for hazard estimates
+require(foreign)  # for reading data set from Stata
+require(survival) # for Surv and survfit
+require(muhaz)    # for hazard estimates
 require(dplyr)    # for data manipulation
 
 ## @knitr loadPreprocess
@@ -62,9 +62,6 @@ melanoma %>%
     summarise(D = sum(death_cancer), M = sum(surv_mm), Rate = D/M) %>%
     mutate(CI_low = Rate + qnorm(0.025) * Rate / sqrt(D),
            CI_high = Rate + qnorm(0.975) * Rate / sqrt(D))
-
-## alternative:
-## ir.est(melanoma, grp="stage", event="death_cancer", p.time="surv_mm")
 
 melanoma %>%
     select(death_cancer, surv_yy, stage) %>%

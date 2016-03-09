@@ -4,23 +4,16 @@
 ##         Benedicte Delcoigne, 2015-03-03
 ###############################################################################
 
-## ## Install needed packages only need to be done once
-## install.packages("foreign")  #Needed to read data set from Stata
-## install.packages("epiR")
-## install.packages("survival")
-## install.packages("ggplot2")
-## install.packages("RCurl")
-## install.packages("dplyr")
 
 ###############################################################################
 ## Exercise 8
 ###############################################################################
 ## @knitr loadDependecies
-require(survival)
-require(foreign) #Needed to read data set from Stata
+require(survival) # for Surv and survfit
+require(foreign)  # for reading data set from Stata
 require(ggplot2)
-require(dplyr)
-require(muhaz) #for hazard estimates
+require(dplyr)    # for data manipulation
+require(muhaz)    # for hazard estimates
 
 
 ###########################################
@@ -170,5 +163,3 @@ poisson8e2 <- glm( chd ~ fu + hieng + job + bmi + offset( log( t_entry) ),
 
 summary(poisson8e2)
 IRR(poisson8e2)
-
-

@@ -4,7 +4,7 @@ Laboratory exercise 6
 -----------
 
 ### Suggested solutions by
-Author: Annika Tillander, 2014-01-30  
+Author: Annika Tillander, 2014-01-30 <br/>
 Edited: Andreas Karlsson, 2015-03-01
 
 ## Diet data: tabulating incidence rates and modelling with Poisson regression
@@ -13,8 +13,8 @@ Edited: Andreas Karlsson, 2015-03-01
 
 Load the diet data using time-on-study as the timescale.
 
-```{r setup, cache=FALSE, message=FALSE, echo=FALSE}	
-library('knitr')	
+```{r setup, cache=FALSE, message=FALSE, echo=FALSE}
+library('knitr')
 read_chunk('q6.R')
 opts_chunk$set(cache=FALSE)
 ```
